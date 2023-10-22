@@ -1,6 +1,9 @@
 # Deep-Learning
 Semesterprojekt Gesichtserkennung
 
+Präsentation MS1: https://docs.google.com/presentation/d/1CirtzZD4dFoKJNWN5dVvR1WtWscuiD5d6cODkXsCKv4/edit?usp=sharing
+
+
 Hilfen: Mobilenetv2 für Tensorflow (vortrainiertes Netz welches optimiert für die Bilderkennung ist)
 
 Tutorial/Literatur für MS2 (Face Detection):
