@@ -1,0 +1,6 @@
+outs:
+- md5: 5a700c543dc3ca25c22b7d9c96607da5.dir
+  size: 455136293
+  nfiles: 1098
+  hash: md5
+  path: monkey
