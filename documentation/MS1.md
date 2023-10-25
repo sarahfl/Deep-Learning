@@ -14,3 +14,12 @@
 ### Sonstiege (Autos, Motorräder, Früchte etc.)
 - Natural Images
 - Zuschnitt benötigt
+
+# Besprechung VL 25.10.2023
+- Augmentierung der Trainingsbilder, Dropout (Overfitting verhindern)
+- https://becominghuman.ai/image-data-pre-processing-for-neural-networks-498289068258
+- Conv -> Pooling -> Conv -> Pooling.... -> Fully Connceted Layer
+- Batch-Normalisierung
+
+# Sonstiges
+- Tensorboard
