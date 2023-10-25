@@ -20,6 +20,7 @@
 - https://becominghuman.ai/image-data-pre-processing-for-neural-networks-498289068258
 - Conv -> Pooling -> Conv -> Pooling.... -> Fully Connceted Layer
 - Batch-Normalisierung
+- Architektur wählen: einmal mit vortrainierten Gewichten etc. und einmal mit eigenen Daten neu trainieren
 
 # Sonstiges
 - Tensorboard
