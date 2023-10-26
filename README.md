@@ -11,6 +11,7 @@ Image Classification with Tensorflow -> https://www.tensorflow.org/tutorials/ima
 Beispiel zur Image Classfication anhand von Klamotten -> https://www.tensorflow.org/tutorials/keras/classification
 
 Transfer Learning mit MobileNetV2 -> https://www.tensorflow.org/tutorials/images/transfer_learning
+https://www.section.io/engineering-education/building-a-multiclass-image-classifier-using-mobilenet-v2-and-tensorflow/
 
 Preprocessing:
 Wie gehen wir mit Input-Bildern unterschiedlicher Größe um? -> https://wandb.ai/ayush-thakur/dl-question-bank/reports/How-to-Handle-Images-of-Different-Sizes-in-a-Convolutional-Neural-Network--VmlldzoyMDk3NzQ ; https://medium.com/analytics-vidhya/how-to-pick-the-optimal-image-size-for-training-convolution-neural-network-65702b880f05
