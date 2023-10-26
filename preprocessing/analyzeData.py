@@ -1,7 +1,7 @@
 import os
 
-path = "C:/Users/sarah/Deep-Learning/data/UTKFace"
-files = os.listdir(path)
+path_in = "C:/Users/sarah/Deep-Learning/data/UTKFace"
+files = os.listdir(path_in)
 
 result = []
 for i in files:
