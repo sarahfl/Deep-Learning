@@ -56,18 +56,17 @@ def get_test_dataset(directory, batch_size=32, size_img=(200, 200)):
     )
 
 
-def load_model_training(model_type, input_size, dropout, classes=None):
-    # noch eigene layer zu den Modellen hinzufügen?
+def load_model_training(model_type, image_size_quadratic, dropout, classes=None):
     if model_type == "mobileNetV2Scratch":
         base_model = tf.keras.applications.MobileNetV2(
-            input_shape=(input_size, input_size, 3),
+            input_shape=(image_size_quadratic, image_size_quadratic, 3),
             include_top=False,
             weights=None,
             classifier_activation="sigmoid",
         )
     else:  # model_type == "mobileNetV2":
         base_model = tf.keras.applications.MobileNetV2(
-            input_shape=(input_size, input_size, 3),
+            input_shape=(image_size_quadratic, image_size_quadratic, 3),
             weights="imagenet",
             classes=1000,
             classifier_activation="sigmoid",
@@ -84,9 +83,11 @@ def train_model(model, training_data, validation_data, epochs, file_name):
     training_data = training_data.prefetch(buffer_size=tf.data.AUTOTUNE)
     validation_data = validation_data.prefetch(buffer_size=tf.data.AUTOTUNE)
 
+    # TODO: make prettier
+    # TODO: Check why loss is not changing at all.
+    # https://www.tensorflow.org/tutorials/images/transfer_learning#create_the_base_model_from_the_pre-trained_convnets
     image_batch, label_batch = next(iter(training_data))
     feature_batch = model(image_batch)
-    # print(feature_batch.shape)
     global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
     feature_batch_average = global_average_layer(feature_batch)
     print(feature_batch_average.shape)
@@ -100,18 +101,21 @@ def train_model(model, training_data, validation_data, epochs, file_name):
     x = global_average_layer(x)
     x = tf.keras.layers.Dropout(0.2)(x)
     outputs = prediction_layer(x)
+    tf.keras.utils.plot_model(model, show_shapes=True)
     model = tf.keras.Model(inputs, outputs)
+    len(model.trainable_variables)
+
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(),
-        loss=tf.keras.losses.BinaryCrossentropy(),
-        metrics=["accuracy"],
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.05),
+        loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+        metrics=["accuracy"],  # [tf.keras.metrics.BinaryAccuracy(threshold=0, name='accuracy')]
     )
     log_dir = "model/logsTensorBoard/" + datetime.datetime.now().strftime(
         "%Y%m%d-%H%M%S"
     )
     # mehr optionen möglich
     tensor_board = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-    model.summary()
+    # model.summary()
 
     tf.debugging.set_log_device_placement(True)
     print(training_data)
