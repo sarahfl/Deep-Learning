@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 # https://www.tensorflow.org/tutorials/images/transfer_learning
 
 
-def getTrainDataset(
-    directory, seed=125, batch_size=32, size_img=(200, 200), validation=0.2
+def get_train_dataset(
+        directory, seed=125, batch_size=32, size_img=(200, 200), validation=0.2
 ):
     """
     import Training Dataset from directory
@@ -36,7 +36,7 @@ def getTrainDataset(
     )
 
 
-def getTestDataset(directory, batch_size=32, size_img=(200, 200)):
+def get_test_dataset(directory, batch_size=32, size_img=(200, 200)):
     """
     import Training Dataset from directory
 
@@ -56,32 +56,51 @@ def getTestDataset(directory, batch_size=32, size_img=(200, 200)):
     )
 
 
-def loadModelTraining(modelType, inputSize, dropout, classes=None):
+def load_model_training(model_type, input_size, dropout, classes=None):
     # noch eigene layer zu den Modellen hinzufügen?
-    if modelType == "mobileNetV2Scratch":
-        mobileNetV2Scratch = tf.keras.applications.MobileNetV2(
-            input_shape=(inputSize, inputSize, 3),
+    if model_type == "mobileNetV2Scratch":
+        base_model = tf.keras.applications.MobileNetV2(
+            input_shape=(input_size, input_size, 3),
             include_top=False,
             weights=None,
-            dropout_rate=dropout,
             classifier_activation="sigmoid",
-            include_preprocessing=True,
         )
-        return mobileNetV2Scratch
-
-    if modelType == "mobileNetV2":
-        mobileNetV2 = tf.keras.applications.MobileNetV2(
-            input_shape=(inputSize, inputSize, 3),
+    else:  # model_type == "mobileNetV2":
+        base_model = tf.keras.applications.MobileNetV2(
+            input_shape=(input_size, input_size, 3),
             weights="imagenet",
             classes=1000,
-            dropout_rate=dropout,
             classifier_activation="sigmoid",
-            include_preprocessing=True,
         )
-        return mobileNetV2
+    base_model.trainable = False
+    return base_model
 
 
-def trainModel(model, trainingData, validationData, epochs, fileName):
+def data_augmentation(x):
+    return x
+
+
+def train_model(model, training_data, validation_data, epochs, file_name):
+    training_data = training_data.prefetch(buffer_size=tf.data.AUTOTUNE)
+    validation_data = validation_data.prefetch(buffer_size=tf.data.AUTOTUNE)
+
+    image_batch, label_batch = next(iter(training_data))
+    feature_batch = model(image_batch)
+    # print(feature_batch.shape)
+    global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
+    feature_batch_average = global_average_layer(feature_batch)
+    print(feature_batch_average.shape)
+    prediction_layer = tf.keras.layers.Dense(1)
+    prediction_batch = prediction_layer(feature_batch_average)
+    print(prediction_batch.shape)
+    inputs = tf.keras.Input(shape=(200, 200, 3))
+    x = data_augmentation(inputs)
+    x = tf.keras.applications.mobilenet_v2.preprocess_input(x)
+    x = model(x, training=False)
+    x = global_average_layer(x)
+    x = tf.keras.layers.Dropout(0.2)(x)
+    outputs = prediction_layer(x)
+    model = tf.keras.Model(inputs, outputs)
     model.compile(
         optimizer=tf.keras.optimizers.Adam(),
         loss=tf.keras.losses.BinaryCrossentropy(),
@@ -91,24 +110,24 @@ def trainModel(model, trainingData, validationData, epochs, fileName):
         "%Y%m%d-%H%M%S"
     )
     # mehr optionen möglich
-    tensorBoard = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+    tensor_board = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
     model.summary()
 
     tf.debugging.set_log_device_placement(True)
-
+    print(training_data)
     history = model.fit(
-        trainingData,
+        training_data,
         epochs=epochs,
-        validation_data=validationData,
-        callbacks=[tensorBoard],
+        validation_data=validation_data,
+        callbacks=[tensor_board],
     )
 
     # save model
-    model.save("model/savedModels" + fileName)
+    model.save("model/savedModels" + file_name)
     return history
 
 
-def plotModel(history, plotName):
+def plot_model(history, plot_name):
     acc = history.history["accuracy"]
     val_acc = history.history["val_accuracy"]
     loss = history.history["loss"]
@@ -135,4 +154,4 @@ def plotModel(history, plotName):
     plt.show()
 
     # save plot
-    plt.savefig("model/plots/" + plotName)
+    plt.savefig("model/plots/" + plot_name)
