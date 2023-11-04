@@ -8,12 +8,13 @@ import tensorflow as tf
 _URL = 'https://storage.googleapis.com/mledu-datasets/cats_and_dogs_filtered.zip'
 path_to_zip = tf.keras.utils.get_file('cats_and_dogs.zip', origin=_URL, extract=True)
 PATH = os.path.join(os.path.dirname(path_to_zip), 'cats_and_dogs_filtered')
-
+PATH = '/home/xaver/Documents/repos/fh/Train_Test_Folder/'
 train_dir = os.path.join(PATH, 'train')
-validation_dir = os.path.join(PATH, 'validation')
+validation_dir = os.path.join(PATH, 'test')  # validation
 
 BATCH_SIZE = 32
-IMG_SIZE = (160, 160)
+Q_SIZE = 200
+IMG_SIZE = (Q_SIZE, Q_SIZE)
 
 train_dataset = tf.keras.utils.image_dataset_from_directory(train_dir,
                                                             shuffle=True,
@@ -94,7 +95,7 @@ prediction_layer = tf.keras.layers.Dense(1)
 prediction_batch = prediction_layer(feature_batch_average)
 print(prediction_batch.shape)
 ##
-inputs = tf.keras.Input(shape=(160, 160, 3))
+inputs = tf.keras.Input(shape=(Q_SIZE, Q_SIZE, 3))
 x = data_augmentation(inputs)
 x = preprocess_input(x)
 x = base_model(x, training=False)
