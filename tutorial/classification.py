@@ -216,4 +216,21 @@ for i in range(9):
     plt.imshow(image_batch[i].astype("uint8"))
     plt.title(class_names[predictions[i]])
     plt.axis("off")
+
+model.save('my_model.keras')
 ##
+# Load and preprocess the new image
+model = tf.keras.models.load_model('my_model.keras')
+image_path = '/home/xaver/Documents/repos/fh/1_0_2_20161219162649582.jpg'
+img = tf.keras.preprocessing.image.load_img(image_path, target_size=(200, 200))  # Adjust the target size as needed
+img = tf.keras.preprocessing.image.img_to_array(img)
+img = np.expand_dims(img, axis=0)
+# Make predictions using the model
+predictions = model.predict(preprocess_input(img))
+print(predictions)
+# Apply a sigmoid to convert to probabilities
+probabilities = tf.nn.sigmoid(predictions)
+print(probabilities)
+# Thresholding to get binary class labels (0 or 1)
+binary_predictions = np.where(probabilities < 0.5, 0, 1)
+print(binary_predictions)
