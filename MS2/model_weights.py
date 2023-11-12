@@ -80,11 +80,12 @@ plt.show()
 # trainable = False -> freeze all weights in the model
 IMG_SHAPE = IMG_SIZE + (3,)
 base_model = tf.keras.applications.MobileNetV2(
-    weights='imagenet',  # Load weights pre-trained on ImageNet.
+    weights=None,  # Load weights pre-trained on ImageNet.
     input_shape=IMG_SHAPE,
     include_top=False,
 )  # Do not include the ImageNet classifier at the top.
 
+#TODO: retrain weights model
 base_model.trainable = False
 
 ##
