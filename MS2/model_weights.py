@@ -8,9 +8,9 @@ import tensorflow as tf
 train_dir = '/home/sarah/Deep-Learning/Train_Test_Folder/train'
 test_dir = '/home/sarah/Deep-Learning/Train_Test_Folder/test'
 
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
-EPOCHS = 8
+EPOCHS = 50
 
 ##
 # -- TRAINING AND VALIDATION DATA --------------------------------------------------------------------------------------
@@ -86,7 +86,16 @@ base_model = tf.keras.applications.MobileNetV2(
 )  # Do not include the ImageNet classifier at the top.
 
 #TODO: retrain weights model
-base_model.trainable = False
+base_model.trainable = True
+print("Number of layers in the base model: ", len(base_model.layers))
+
+##
+# -- RETRAIN TOP LAYERS ------------------------------------------------------------------------------------------------
+fine_tune_at = 100
+# Freeze all the layers before the `fine_tune_at` layer
+for layer in base_model.layers[:fine_tune_at]:
+    layer.trainable = False
+
 
 ##
 # -- CREATE NEW MODEL ON TOP -------------------------------------------------------------------------------------------
@@ -112,7 +121,7 @@ print('Number of trainable weights={}'.format(len(model.trainable_weights)))
 tf.keras.utils.plot_model(model, show_shapes=True) #save model as png
 ##
 # -- COMPILE THE MODEL -------------------------------------------------------------------------------------------------
-base_learning_rate = 0.0001
+base_learning_rate = 0.1
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
               loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               metrics=[tf.keras.metrics.BinaryAccuracy(threshold=0, name='accuracy')])
