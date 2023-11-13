@@ -8,7 +8,7 @@ import tensorflow as tf
 train_dir = '/home/sarah/Deep-Learning/Train_Test_Folder/train'
 test_dir = '/home/sarah/Deep-Learning/Train_Test_Folder/test'
 
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
 EPOCHS = 8
 
@@ -87,6 +87,14 @@ base_model = tf.keras.applications.MobileNetV2(
 
 base_model.trainable = False
 
+'''##
+# -- RETRAIN TOP LAYERS ------------------------------------------------------------------------------------------------
+fine_tune_at = 100
+# Freeze all the layers before the `fine_tune_at` layer
+for layer in base_model.layers[:fine_tune_at]:
+    layer.trainable = False
+
+'''
 ##
 # -- CREATE NEW MODEL ON TOP -------------------------------------------------------------------------------------------
 preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input

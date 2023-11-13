@@ -1,7 +1,7 @@
 ##
 import matplotlib.pyplot as plt
-import os
 import tensorflow as tf
+import pandas as pd
 
 # -- DEEP LEARNING MS2 -------------------------------------------------------------------------------------------------
 ##
@@ -75,26 +75,16 @@ for image, _ in train_dataset.take(1):
 plt.show()
 
 ##
-# -- CREATE BASE MODEL ----------------------------------------------------------------------------------------------
-# include_top = False -> load the network without the classification layers at the top
-# trainable = False -> freeze all weights in the model
+# -- CREATE BASE MODEL -------------------------------------------------------------------------------------------------
 IMG_SHAPE = IMG_SIZE + (3,)
 base_model = tf.keras.applications.MobileNetV2(
-    weights=None,  # Load weights pre-trained on ImageNet.
+    weights=None,
     input_shape=IMG_SHAPE,
     include_top=False,
-)  # Do not include the ImageNet classifier at the top.
+)
 
-#TODO: retrain weights model
 base_model.trainable = True
 print("Number of layers in the base model: ", len(base_model.layers))
-
-##
-# -- RETRAIN TOP LAYERS ------------------------------------------------------------------------------------------------
-fine_tune_at = 130
-# Freeze all the layers before the `fine_tune_at` layer
-for layer in base_model.layers[:fine_tune_at]:
-    layer.trainable = False
 
 
 ##
@@ -102,24 +92,32 @@ for layer in base_model.layers[:fine_tune_at]:
 preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
 
 inputs = tf.keras.Input(shape=IMG_SHAPE)
-x = data_augmentation(inputs)  # Apply random data augmentation
+x = data_augmentation(inputs)
 # Pre-trained Model weights requires that input be scaled from (0, 255) to a range of [-1,1]
 x = preprocess_input(x)
-x = base_model(x, training=False)
+x = base_model(x, training=True)
 x = tf.keras.layers.GlobalAveragePooling2D()(x)
-x = tf.keras.layers.Dropout(0.2)(x)  # Regularize with dropout
-outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
+x = tf.keras.layers.Dropout(0.5)(x)  # Regularize overfitting with dropout
+outputs = tf.keras.layers.Dense(1, activation='sigmoid', kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)
 model = tf.keras.Model(inputs, outputs)
 
 model.summary()
+
 print('Number of trainable weights={}'.format(len(model.trainable_weights)))
-tf.keras.utils.plot_model(model, show_shapes=True) #save model as png
+
 ##
 # -- COMPILE THE MODEL -------------------------------------------------------------------------------------------------
-base_learning_rate = 0.8
+base_learning_rate = 0.0001
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
-              loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+              loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
               metrics=[tf.keras.metrics.BinaryAccuracy(threshold=0, name='accuracy')])
+
+##
+# save model summary to file
+with open('summaryModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE), 'w') as f:
+    model.summary(print_fn=lambda x: f.write(x + '\n'))
+
+tf.keras.utils.plot_model(model, show_shapes=True, to_file='layersModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.png'.format(base_learning_rate, EPOCHS, BATCH_SIZE))  # save model as png
 
 ##
 # -- TRAIN THE MODEL ---------------------------------------------------------------------------------------------------
@@ -128,7 +126,10 @@ history = model.fit(train_dataset,
                     batch_size=BATCH_SIZE,
                     validation_data=validation_dataset)
 
-# TODO: save the model
+hist_df = pd.DataFrame(history.history)
+hist_csv_file = 'historyModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.png'.format(base_learning_rate, EPOCHS, BATCH_SIZE)
+with open(hist_csv_file, mode='w') as f:
+    hist_df.to_csv(f)
 
 ##
 # -- REVIEW THE LEARNING CURVES ----------------------------------------------------------------------------------------
@@ -155,10 +156,12 @@ plt.ylabel('Cross Entropy')
 plt.ylim([0, 1.0])
 plt.title('Training and Validation Loss')
 plt.xlabel('epoch')
+#save plot
+plt.savefig('plotModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.png'.format(base_learning_rate, EPOCHS, BATCH_SIZE))
 plt.show()
 
 ##
-# -- EVALUATE VALIDATION AND TEST DATA ------------------------------------------------------------------------------------------------
+# -- EVALUATE VALIDATION AND TEST DATA ---------------------------------------------------------------------------------
 lossV, accuracyV = model.evaluate(validation_dataset)
 lossT, accuracyT = model.evaluate(test_dataset)
 print('Validation accuracy :', accuracyV)
@@ -184,5 +187,3 @@ for i in range(9):
     plt.title(class_names[predictions[i]])
     plt.axis("off")
 plt.show()
-
-
