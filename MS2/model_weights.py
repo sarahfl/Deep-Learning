@@ -10,7 +10,7 @@ test_dir = '/home/sarah/Deep-Learning/Train_Test_Folder/test'
 
 BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
-EPOCHS = 50
+EPOCHS = 100
 
 ##
 # -- TRAINING AND VALIDATION DATA --------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ print("Number of layers in the base model: ", len(base_model.layers))
 
 ##
 # -- RETRAIN TOP LAYERS ------------------------------------------------------------------------------------------------
-fine_tune_at = 100
+fine_tune_at = 130
 # Freeze all the layers before the `fine_tune_at` layer
 for layer in base_model.layers[:fine_tune_at]:
     layer.trainable = False
@@ -103,17 +103,12 @@ preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
 
 inputs = tf.keras.Input(shape=IMG_SHAPE)
 x = data_augmentation(inputs)  # Apply random data augmentation
-
 # Pre-trained Model weights requires that input be scaled from (0, 255) to a range of [-1,1]
 x = preprocess_input(x)
-
-# The base model contains batchnorm layers. We want to keep them in inference mode
-# when we unfreeze the base model for fine-tuning, so we make sure that the
-# base_model is running in inference mode here.
 x = base_model(x, training=False)
 x = tf.keras.layers.GlobalAveragePooling2D()(x)
 x = tf.keras.layers.Dropout(0.2)(x)  # Regularize with dropout
-outputs = tf.keras.layers.Dense(1)(x)
+outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
 model = tf.keras.Model(inputs, outputs)
 
 model.summary()
@@ -121,7 +116,7 @@ print('Number of trainable weights={}'.format(len(model.trainable_weights)))
 tf.keras.utils.plot_model(model, show_shapes=True) #save model as png
 ##
 # -- COMPILE THE MODEL -------------------------------------------------------------------------------------------------
-base_learning_rate = 0.1
+base_learning_rate = 0.8
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
               loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
               metrics=[tf.keras.metrics.BinaryAccuracy(threshold=0, name='accuracy')])
