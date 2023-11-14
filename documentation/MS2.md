@@ -1,3 +1,6 @@
+# Link zur Präsentation MS2
+https://docs.google.com/presentation/d/1--hv0oR1l6ViucykqG2xG9q1yx2f0ZlkT4kUALSswPw/edit?usp=sharing
+
 # Datenauswahl
 
 ## Trainingsdaten
