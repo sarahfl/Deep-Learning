@@ -79,6 +79,8 @@ IMG_SHAPE = IMG_SIZE + (3,)
 base_model = tf.keras.applications.MobileNetV2(input_shape=IMG_SHAPE,
                                                include_top=False,  # because top layer is too flat
                                                weights='imagenet')
+# SCRATCH: include_top = True
+# weights=None
 ##
 image_batch, label_batch = next(iter(train_dataset))
 feature_batch = base_model(image_batch)
