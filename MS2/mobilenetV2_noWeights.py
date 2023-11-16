@@ -59,7 +59,6 @@ test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
 
 ##
 # -- DATA AUGMENTATION -------------------------------------------------------------------------------------------------
-
 data_augmentation = tf.keras.Sequential([
     tf.keras.layers.RandomFlip('horizontal'),
     tf.keras.layers.RandomRotation(0.2),
@@ -119,7 +118,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rat
 with open('summaryModel_noWeights_2_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE), 'w') as f:
     model.summary(print_fn=lambda x: f.write(x + '\n'))
 
-tf.keras.utils.plot_model(model, show_shapes=True, to_file='layersModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.png'.format(base_learning_rate, EPOCHS, BATCH_SIZE))  # save model as png
+#tf.keras.utils.plot_model(model, show_shapes=True, to_file='layersModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.png'.format(base_learning_rate, EPOCHS, BATCH_SIZE))  # save model as png
 
 ##
 # -- TRAIN THE MODEL ---------------------------------------------------------------------------------------------------
