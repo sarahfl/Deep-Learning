@@ -8,12 +8,13 @@ import tensorflow as tf
 _URL = 'https://storage.googleapis.com/mledu-datasets/cats_and_dogs_filtered.zip'
 path_to_zip = tf.keras.utils.get_file('cats_and_dogs.zip', origin=_URL, extract=True)
 PATH = os.path.join(os.path.dirname(path_to_zip), 'cats_and_dogs_filtered')
-
+PATH = '/home/xaver/Documents/repos/fh/Train_Test_Folder/'
 train_dir = os.path.join(PATH, 'train')
-validation_dir = os.path.join(PATH, 'validation')
+validation_dir = os.path.join(PATH, 'test')  # validation
 
 BATCH_SIZE = 32
-IMG_SIZE = (160, 160)
+Q_SIZE = 200
+IMG_SIZE = (Q_SIZE, Q_SIZE)
 
 train_dataset = tf.keras.utils.image_dataset_from_directory(train_dir,
                                                             shuffle=True,
@@ -78,6 +79,8 @@ IMG_SHAPE = IMG_SIZE + (3,)
 base_model = tf.keras.applications.MobileNetV2(input_shape=IMG_SHAPE,
                                                include_top=False,  # because top layer is too flat
                                                weights='imagenet')
+# SCRATCH: include_top = True
+# weights=None
 ##
 image_batch, label_batch = next(iter(train_dataset))
 feature_batch = base_model(image_batch)
@@ -94,7 +97,7 @@ prediction_layer = tf.keras.layers.Dense(1)
 prediction_batch = prediction_layer(feature_batch_average)
 print(prediction_batch.shape)
 ##
-inputs = tf.keras.Input(shape=(160, 160, 3))
+inputs = tf.keras.Input(shape=(Q_SIZE, Q_SIZE, 3))
 x = data_augmentation(inputs)
 x = preprocess_input(x)
 x = base_model(x, training=False)
@@ -215,4 +218,21 @@ for i in range(9):
     plt.imshow(image_batch[i].astype("uint8"))
     plt.title(class_names[predictions[i]])
     plt.axis("off")
+
+model.save('my_model.keras')
 ##
+# Load and preprocess the new image
+model = tf.keras.models.load_model('my_model.keras')
+image_path = '/home/xaver/Documents/repos/fh/1_0_2_20161219162649582.jpg'
+img = tf.keras.preprocessing.image.load_img(image_path, target_size=(200, 200))  # Adjust the target size as needed
+img = tf.keras.preprocessing.image.img_to_array(img)
+img = np.expand_dims(img, axis=0)
+# Make predictions using the model
+predictions = model.predict(preprocess_input(img))
+print(predictions)
+# Apply a sigmoid to convert to probabilities
+probabilities = tf.nn.sigmoid(predictions)
+print(probabilities)
+# Thresholding to get binary class labels (0 or 1)
+binary_predictions = np.where(probabilities < 0.5, 0, 1)
+print(binary_predictions)
