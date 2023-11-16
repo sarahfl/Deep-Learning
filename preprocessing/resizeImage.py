@@ -1,13 +1,27 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from os import listdir
+import os
+from PIL import Image
+from PIL.Image import Resampling
+from tqdm import tqdm
 
 """
 Resize Image and add padding if needed.
 Source: https://stackoverflow.com/questions/44720580/resize-image-to-maintain-aspect-ratio-in-python-opencv
 size: requires a tupel e.g. (200,200)
 """
+
+path_in = "/home/sarah/Desktop/Train_Test_Folder_2/noFace"
+path_out = "/home/sarah/Desktop/Train_Test_Folder_2/noFace_scale"
+
+
+def resizePIL(image_url):
+    with Image.open(image_url) as im:
+        # Provide the target width and height of the image
+        (width, height) = (200, 200)
+        im_resized = im.resize((width, height), resample=Resampling.LANCZOS)
+        return im_resized
 
 
 def resizeAndPad(img, size, padColor=255):
@@ -26,7 +40,7 @@ def resizeAndPad(img, size, padColor=255):
     saspect = float(sw) / sh
 
     if (saspect >= aspect) or (
-        (saspect == 1) and (aspect <= 1)
+            (saspect == 1) and (aspect <= 1)
     ):  # new horizontal image
         new_h = sh
         new_w = np.round(new_h * aspect).astype(int)
@@ -45,7 +59,7 @@ def resizeAndPad(img, size, padColor=255):
 
     # set pad color
     if len(img.shape) == 3 and not isinstance(
-        padColor, (list, tuple, np.ndarray)
+            padColor, (list, tuple, np.ndarray)
     ):  # color image but only one color provided
         padColor = [padColor] * 3
 
@@ -62,3 +76,10 @@ def resizeAndPad(img, size, padColor=255):
     )
 
     return scaled_img
+
+
+i = 0
+for image in tqdm(os.listdir(path_in)):
+    input_image = os.path.join(path_in, image)
+    resizedImage = resizePIL(input_image)
+    resizedImage.save(os.path.join(path_out, image))

@@ -38,8 +38,8 @@ def copyImagesToMS2Data():
 
 
 # copyImagesToMS2Data()
-face = "C:/Users/sarah/Deep-Learning/MS2Data/face/"
-noFace = "C:/Users/sarah/Deep-Learning/MS2Data/noFace/"
+face = "/home/sarah/Desktop/Train_Test_Folder_2/face/"
+noFace = "/home/sarah/Desktop/Train_Test_Folder_2/noFace/"
 len_face = len(os.listdir(face))
 len_noFace = len(os.listdir(noFace))
 deltaFace = int(len_noFace) - int(len_face)
@@ -64,8 +64,8 @@ def deleteimages():
     print("Missing: ", e)
 
 
-# deleteimages()
+#deleteimages()
 # https://github.com/bharatadk/python_splitter
 python_splitter.split_from_folder(
-    "C:/Users/sarah/Deep-Learning/MS2Data", train=0.8, test=0.2
+    "/home/sarah/Desktop/Train_Test_Folder_2", train=0.8, test=0.2
 )

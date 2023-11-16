@@ -5,8 +5,8 @@ import pandas as pd
 
 # -- MOBILENETV2 NO WEIGHTS --------------------------------------------------------------------------------------------
 ##
-train_dir = '/home/sarah/Deep-Learning/Train_Test_Folder/train'
-test_dir = '/home/sarah/Deep-Learning/Train_Test_Folder/test'
+train_dir = '/home/sarah/Deep-Learning/Train_Test_Folder_2/train'
+test_dir = '/home/sarah/Deep-Learning/Train_Test_Folder_2/test'
 
 BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
@@ -116,7 +116,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rat
 
 ##
 # save model summary to file
-with open('summaryModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE), 'w') as f:
+with open('summaryModel_noWeights_2_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE), 'w') as f:
     model.summary(print_fn=lambda x: f.write(x + '\n'))
 
 tf.keras.utils.plot_model(model, show_shapes=True, to_file='layersModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.png'.format(base_learning_rate, EPOCHS, BATCH_SIZE))  # save model as png
@@ -127,16 +127,16 @@ history = model.fit(train_dataset,
                     epochs=EPOCHS,
                     batch_size=BATCH_SIZE,
                     validation_data=validation_dataset)
-
+##
 hist_df = pd.DataFrame(history.history)
-hist_csv_file = 'historyModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.csv'.format(base_learning_rate, EPOCHS, BATCH_SIZE)
+hist_csv_file = 'historyModel_noWeights_2_LR_{}_EPOCHS_{}_BATCH_{}.csv'.format(base_learning_rate, EPOCHS, BATCH_SIZE)
 with open(hist_csv_file, mode='w') as f:
     hist_df.to_csv(f)
 
 
 ##
 #save the model
-model.save('/home/sarah/Deep-Learning/MS2/MobilenetV2/no_weights/model.keras')
+model.save('/home/sarah/Deep-Learning/MS2/MobilenetV2/no_weights_2/model.keras')
 
 ##
 # -- REVIEW THE LEARNING CURVES ----------------------------------------------------------------------------------------
@@ -195,7 +195,7 @@ for i in range(9):
     plt.imshow(image_batch[i].astype('uint8'))
     plt.title(class_names[predictions[i]])
     plt.axis("off")
-plt.savefig('predictions.png')
+plt.savefig('predictions_2.png')
 plt.show()
 
 

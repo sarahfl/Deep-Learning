@@ -1,0 +1,31 @@
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_2 (InputLayer)        [(None, 200, 200, 3)]     0         
+                                                                 
+ sequential (Sequential)     (None, 200, 200, 3)       0         
+                                                                 
+ tf.math.truediv (TFOpLambd  (None, 200, 200, 3)       0         
+ a)                                                              
+                                                                 
+ tf.math.subtract (TFOpLamb  (None, 200, 200, 3)       0         
+ da)                                                             
+                                                                 
+ mobilenetv2_1.00_200 (Func  (None, 7, 7, 1280)        2257984   
+ tional)                                                         
+                                                                 
+ global_average_pooling2d (  (None, 1280)              0         
+ GlobalAveragePooling2D)                                         
+                                                                 
+ dense (Dense)               (None, 128)               163968    
+                                                                 
+ dropout (Dropout)           (None, 128)               0         
+                                                                 
+ dense_1 (Dense)             (None, 1)                 129       
+                                                                 
+=================================================================
+Total params: 2422081 (9.24 MB)
+Trainable params: 2387969 (9.11 MB)
+Non-trainable params: 34112 (133.25 KB)
+_________________________________________________________________
