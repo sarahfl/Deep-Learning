@@ -1,1 +1,0 @@
-dict = {'validation accuracy': 0.9998446702957153, 'validation loss': 0.0008106628665700555, 'test accuracy': 0.9991550445556641, 'test loss': 0.0026059062220156193}
