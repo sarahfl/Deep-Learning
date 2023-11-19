@@ -10,7 +10,7 @@ test_dir = '/home/sarah/Deep-Learning/Train_Test_Folder_2/test'
 
 BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
-EPOCHS = 5
+EPOCHS = 10
 
 ##
 # -- TRAINING AND VALIDATION DATA --------------------------------------------------------------------------------------
@@ -83,15 +83,8 @@ base_model = tf.keras.applications.MobileNetV2(
     include_top=False,
 )
 
-base_model.trainable = False
-print("Number of layers in the base model: ", len(base_model.layers))
-
-##
-# -- RETRAIN TOP LAYERS ------------------------------------------------------------------------------------------------
-fine_tune_at = 100
-# Freeze all the layers before the `fine_tune_at` layer
-for layer in base_model.layers[:fine_tune_at]:
-    layer.trainable = False
+base_model.summary()
+print(len(base_model.trainable_variables))
 
 ##
 # -- CREATE NEW MODEL ON TOP -------------------------------------------------------------------------------------------
@@ -101,14 +94,16 @@ inputs = tf.keras.Input(shape=IMG_SHAPE)
 x = data_augmentation(inputs)
 # Pre-trained Model weights requires that input be scaled from (0, 255) to a range of [-1,1]
 x = preprocess_input(x)
-x = base_model(x, training=False)
+x = base_model(x)
 x = tf.keras.layers.GlobalAveragePooling2D()(x)
 x = tf.keras.layers.Dropout(0.2)(x)  # Regularize with dropout
 outputs = tf.keras.layers.Dense(1)(x)
 model = tf.keras.Model(inputs, outputs)
 
+base_model.trainable = False
+
 model.summary()
-print('Number of trainable weights={}'.format(len(model.trainable_weights)))
+print(len(model.trainable_variables))
 
 ##
 # -- COMPILE THE MODEL -------------------------------------------------------------------------------------------------
@@ -131,44 +126,87 @@ history = model.fit(train_dataset,
                     batch_size=BATCH_SIZE,
                     validation_data=validation_dataset)
 
-##
-hist_df = pd.DataFrame(history.history)
-hist_csv_file = 'historyModel_weights_2_LR_{}_EPOCHS_{}_BATCH_{}.csv'.format(base_learning_rate, EPOCHS, BATCH_SIZE)
-with open(hist_csv_file, mode='w') as f:
-    hist_df.to_csv(f)
-
-##
-# save the model
-model.save('/home/sarah/Deep-Learning/MS2/MobilenetV2/weights_2/model.keras')
-
-##
-# -- REVIEW THE LEARNING CURVES ----------------------------------------------------------------------------------------
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
 
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
+
+
+
+# -- RETRAIN LAYERS ----------------------------------------------------------------------------------------------------
+base_model.trainable = True
+fine_tune_at = 100
+# Freeze all the layers before the `fine_tune_at` layer
+for layer in base_model.layers[:fine_tune_at]:
+    layer.trainable = False
+
+
+
+model.compile(loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+              optimizer = tf.keras.optimizers.RMSprop(learning_rate=base_learning_rate/10),
+              metrics=[tf.keras.metrics.BinaryAccuracy(threshold=0, name='accuracy')])
+
+
+model.summary()
+print(len(model.trainable_variables))
+
+fine_tune_epochs = 10
+total_epochs = EPOCHS + fine_tune_epochs
+
+history_fine = model.fit(train_dataset,
+                         epochs=total_epochs,
+                         initial_epoch=history.epoch[-1],
+                         validation_data=validation_dataset)
+
+
+acc += history_fine.history['accuracy']
+val_acc += history_fine.history['val_accuracy']
+
+loss += history_fine.history['loss']
+val_loss += history_fine.history['val_loss']
+
+
+##
+hist_df = pd.DataFrame(history.history)
+hist_csv_file = 'history_basemodel_100.csv'
+with open(hist_csv_file, mode='w') as f:
+    hist_df.to_csv(f)
+
+hist_df = pd.DataFrame(history_fine.history)
+hist_csv_file = 'history_100.csv'
+with open(hist_csv_file, mode='w') as f:
+    hist_df.to_csv(f)
+
+##
+# save the model
+model.save('/home/sarah/Deep-Learning/MS2/MobilenetV2/model_100.keras')
+
+##
+# -- REVIEW THE LEARNING CURVES ----------------------------------------------------------------------------------------
 plt.figure(figsize=(8, 8))
 plt.subplot(2, 1, 1)
 plt.plot(acc, label='Training Accuracy')
 plt.plot(val_acc, label='Validation Accuracy')
+plt.ylim([0.8, 1])
+plt.plot([EPOCHS-1,EPOCHS-1],
+          plt.ylim(), label='Start Fine Tuning')
 plt.legend(loc='lower right')
-plt.ylabel('Accuracy')
-plt.ylim([min(plt.ylim()), 1])
 plt.title('Training and Validation Accuracy')
 
 plt.subplot(2, 1, 2)
 plt.plot(loss, label='Training Loss')
 plt.plot(val_loss, label='Validation Loss')
-plt.legend(loc='upper right')
-plt.ylabel('Cross Entropy')
 plt.ylim([0, 1.0])
+plt.plot([EPOCHS-1,EPOCHS-1],
+         plt.ylim(), label='Start Fine Tuning')
+plt.legend(loc='upper right')
 plt.title('Training and Validation Loss')
 plt.xlabel('epoch')
-# save plot
-plt.savefig('plotModel_weights_2_LR_{}_EPOCHS_{}_BATCH_{}.png'.format(base_learning_rate, EPOCHS, BATCH_SIZE))
+plt.savefig('finetuning_30.png')
 plt.show()
+
 
 ##
 # -- EVALUATE VALIDATION AND TEST DATA ---------------------------------------------------------------------------------

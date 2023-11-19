@@ -135,7 +135,7 @@ with open(hist_csv_file, mode='w') as f:
 
 ##
 #save the model
-model.save('/home/sarah/Deep-Learning/MS2/MobilenetV2/no_weights_2/model.keras')
+model.save('/home/sarah/Deep-Learning/MS2/MobilenetV2/no_weights_2/model_100.keras')
 
 ##
 # -- REVIEW THE LEARNING CURVES ----------------------------------------------------------------------------------------
