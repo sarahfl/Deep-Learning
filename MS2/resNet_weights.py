@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import pandas as pd
 
-# -- ResNet NO WEIGHTS --------------------------------------------------------------------------------------------
+# -- ResNet WEIGHTS --------------------------------------------------------------------------------------------
 ##
 train_dir = 'Train_Test_Folder_2/train'
 test_dir = 'Train_Test_Folder_2/test'

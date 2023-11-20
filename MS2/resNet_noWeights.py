@@ -5,6 +5,9 @@ import pandas as pd
 
 # -- ResNet NO WEIGHTS --------------------------------------------------------------------------------------------
 ##
+print("GPU Available:", tf.config.list_physical_devices('GPU'))
+print("Using cuDNN:", tf.test.is_built_with_cuda())
+
 train_dir = 'Train_Test_Folder_2/train'
 test_dir = 'Train_Test_Folder_2/test'
 
@@ -133,7 +136,7 @@ with open(hist_csv_file, mode='w') as f:
 
 
 ##
-#save the model
+# save the model
 model.save('resNet/no_weights/model_100.keras')
 
 ##
@@ -178,7 +181,7 @@ print('Test Loss :', lossT)
 #save evaluation to file
 dict = {'validation accuracy': accuracyV, 'validation loss': lossV, 'test accuracy': accuracyT, 'test loss':lossT}
 f = open( 'evaulationModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE), 'w' )
-f.write( 'dict = ' + repr(dict) + '\n' )
+f.write( 'dict = ' + repr(dict) + '\n')
 f.close()
 
 ##
