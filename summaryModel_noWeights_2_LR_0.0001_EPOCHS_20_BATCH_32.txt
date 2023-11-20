@@ -1,0 +1,30 @@
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_2 (InputLayer)        [(None, 200, 200, 3)]     0         
+                                                                 
+ sequential (Sequential)     (None, 200, 200, 3)       0         
+                                                                 
+ tf.__operators__.getitem (  (None, 200, 200, 3)       0         
+ SlicingOpLambda)                                                
+                                                                 
+ tf.nn.bias_add (TFOpLambda  (None, 200, 200, 3)       0         
+ )                                                               
+                                                                 
+ resnet50 (Functional)       (None, 7, 7, 2048)        23587712  
+                                                                 
+ global_average_pooling2d (  (None, 2048)              0         
+ GlobalAveragePooling2D)                                         
+                                                                 
+ dense (Dense)               (None, 128)               262272    
+                                                                 
+ dropout (Dropout)           (None, 128)               0         
+                                                                 
+ dense_1 (Dense)             (None, 1)                 129       
+                                                                 
+=================================================================
+Total params: 23850113 (90.98 MB)
+Trainable params: 23796993 (90.78 MB)
+Non-trainable params: 53120 (207.50 KB)
+_________________________________________________________________
