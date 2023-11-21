@@ -5,12 +5,12 @@ import pandas as pd
 
 # -- MOBILENETV2 NO WEIGHTS --------------------------------------------------------------------------------------------
 ##
-train_dir = '/home/sarah/Deep-Learning/Train_Test_Folder_2/train'
-test_dir = '/home/sarah/Deep-Learning/Train_Test_Folder_2/test'
+train_dir = 'Train_Test_Folder_2/train'
+test_dir = 'Train_Test_Folder_2/test'
 
 BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
-EPOCHS = 20
+EPOCHS = 10
 
 ##
 # -- TRAINING AND VALIDATION DATA --------------------------------------------------------------------------------------
@@ -97,8 +97,8 @@ x = data_augmentation(inputs)
 x = preprocess_input(x)
 x = base_model(x, training=True)
 x = tf.keras.layers.GlobalAveragePooling2D()(x)
-x = tf.keras.layers.Dense(128, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)
-x = tf.keras.layers.Dropout(0.5)(x)  # Regularize overfitting with dropout
+# x = tf.keras.layers.Dense(128, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)
+x = tf.keras.layers.Dropout(0.2)(x)  # Regularize overfitting with dropout
 outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
 model = tf.keras.Model(inputs, outputs)
 

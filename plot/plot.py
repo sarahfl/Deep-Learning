@@ -27,7 +27,7 @@ for value_to_plot in values_to_plot:
         all_epochs.append(epochs)
         all_values.append(values)
 
-        # Extract label from file path (assuming file name without extension)
+        # Extract label from file path
         file_name = os.path.splitext(os.path.basename(file_path))[0]
         labels.append(file_name)
 

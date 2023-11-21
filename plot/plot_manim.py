@@ -6,6 +6,7 @@ import os
 value_to_plot = "accuracy"  # loss, accuracy, val_loss, val_accuracy
 file_paths = ["mobileNet", "efficientNetB0", "resNet50"]  # Add all file paths here
 
+
 class PlotMultipleCSVData(Scene):
     def construct(self):
         # Initialize lists to store data
@@ -27,7 +28,7 @@ class PlotMultipleCSVData(Scene):
             all_epochs.append(epochs)
             all_values.append(values)
 
-            # Extract label from file path (assuming file name without extension)
+            # Extract label from file path
             file_name = os.path.splitext(os.path.basename(file_path))[0]
             labels.append(file_name)
 

@@ -164,3 +164,4 @@ cython_debug/
 # Own
 Train_Test_Folder/
 Train_Test_Folder_2/
+MS2/resNet/resnet50_model.h5
