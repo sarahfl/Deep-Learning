@@ -89,7 +89,6 @@ base_model = tf.keras.applications.ResNet50(
 base_model.trainable = True
 print("Number of layers in the base model: ", len(base_model.layers))
 
-
 ##
 # -- CREATE NEW MODEL ON TOP -------------------------------------------------------------------------------------------
 preprocess_input = tf.keras.applications.resnet50.preprocess_input
@@ -117,10 +116,11 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rat
 
 ##
 # save model summary to file
-with open('summaryModel_noWeights_2_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE), 'w') as f:
+with open('resNet/summaryModel_noWeights_2_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE),
+          'w') as f:
     model.summary(print_fn=lambda x: f.write(x + '\n'))
 
-#tf.keras.utils.plot_model(model, show_shapes=True, to_file='layersModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.png'.format(base_learning_rate, EPOCHS, BATCH_SIZE))  # save model as png
+# tf.keras.utils.plot_model(model, show_shapes=True, to_file='layersModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.png'.format(base_learning_rate, EPOCHS, BATCH_SIZE))  # save model as png
 
 ##
 # -- TRAIN THE MODEL ---------------------------------------------------------------------------------------------------
@@ -130,10 +130,10 @@ history = model.fit(train_dataset,
                     validation_data=validation_dataset)
 ##
 hist_df = pd.DataFrame(history.history)
-hist_csv_file = 'historyModel_noWeights_2_LR_{}_EPOCHS_{}_BATCH_{}.csv'.format(base_learning_rate, EPOCHS, BATCH_SIZE)
+hist_csv_file = 'resNet/historyModel_noWeights_2_LR_{}_EPOCHS_{}_BATCH_{}.csv'.format(base_learning_rate, EPOCHS,
+                                                                                      BATCH_SIZE)
 with open(hist_csv_file, mode='w') as f:
     hist_df.to_csv(f)
-
 
 ##
 # save the model
@@ -164,7 +164,8 @@ plt.ylabel('Cross Entropy')
 plt.ylim([0, 1.0])
 plt.title('Training and Validation Loss')
 plt.xlabel('epoch')
-#save plot
+
+# save plot
 plt.savefig('plotModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.png'.format(base_learning_rate, EPOCHS, BATCH_SIZE))
 plt.show()
 
@@ -178,17 +179,18 @@ print('Test accuracy :', accuracyT)
 print('Test Loss :', lossT)
 
 ##
-#save evaluation to file
-dict = {'validation accuracy': accuracyV, 'validation loss': lossV, 'test accuracy': accuracyT, 'test loss':lossT}
-f = open( 'evaulationModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE), 'w' )
-f.write( 'dict = ' + repr(dict) + '\n')
+# save evaluation to file
+dict = {'validation accuracy': accuracyV, 'validation loss': lossV, 'test accuracy': accuracyT, 'test loss': lossT}
+f = open('resNet/evaulationModel_noWeights_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE),
+         'w')
+f.write('dict = ' + repr(dict) + '\n')
 f.close()
 
 ##
 # plot example from test image with predicted labels
 image_batch, label_batch = test_dataset.as_numpy_iterator().next()
 predictions = model.predict_on_batch(image_batch).flatten()
-predictions = tf.where(predictions < 0.5, 0, 1) #round float to integer
+predictions = tf.where(predictions < 0.5, 0, 1)  # round float to integer
 
 plt.figure(figsize=(10, 10))
 for i in range(9):
@@ -198,6 +200,3 @@ for i in range(9):
     plt.axis("off")
 plt.savefig('predictions_2.png')
 plt.show()
-
-
-
