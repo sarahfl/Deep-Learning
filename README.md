@@ -22,3 +22,4 @@ Wie haben bekannte andere CNNs ihre Bilder vorbereitet? -> https://medium.com/un
 # Meilensteine
 
 - [MS1](documentation/MS1.md)
+- [MS2](documentation/MS2.md)
