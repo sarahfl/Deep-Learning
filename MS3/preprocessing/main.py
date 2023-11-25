@@ -1,3 +1,7 @@
 import configure
 
-configure.renameImages()
+# configure.renameImages()
+
+#configure.ageDistribution()
+
+configure.sexDistribution()
