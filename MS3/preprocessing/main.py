@@ -1,0 +1,3 @@
+import configure
+
+configure.renameImages()

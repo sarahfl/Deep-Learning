@@ -23,3 +23,5 @@ for folder in dir_list:
         male, female = countMaleFemaleFace(path)
         print("#maleFace: ", male)
         print("#femaleFace: ", female)
+
+
