@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 train_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/MS3_Train_Test_Folder/train'
 val_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/MS3_Train_Test_Folder/val'
@@ -20,38 +21,42 @@ train_dataset = tf.keras.utils.image_dataset_from_directory(train_dir,
                                                             color_mode='rgb',
                                                             batch_size=BATCH_SIZE,
                                                             image_size=IMG_SIZE,
-                                                            shuffle=True)
+                                                            shuffle=True,
+                                                            )
 
 # -- VALIDATION DATA ---------------------------------------------------------------------------------------------------
-val_dataset = tf.keras.utils.image_dataset_from_directory(val_dir,
-                                                            labels='inferred',
-                                                            label_mode='categorical',
-                                                            class_names=None,
-                                                            color_mode='rgb',
-                                                            batch_size=BATCH_SIZE,
-                                                            image_size=IMG_SIZE,
-                                                            shuffle=True)
+validation_dataset = tf.keras.utils.image_dataset_from_directory(val_dir,
+                                                                 labels='inferred',
+                                                                 label_mode='categorical',
+                                                                 class_names=None,
+                                                                 color_mode='rgb',
+                                                                 batch_size=BATCH_SIZE,
+                                                                 image_size=IMG_SIZE,
+                                                                 shuffle=True,
+                                                                 )
 
 # -- TEST DATA ---------------------------------------------------------------------------------------------------------
 test_dataset = tf.keras.utils.image_dataset_from_directory(test_dir,
-                                                            labels='inferred',
-                                                            label_mode='categorical',
-                                                            class_names=None,
-                                                            color_mode='rgb',
-                                                            batch_size=BATCH_SIZE,
-                                                            image_size=IMG_SIZE,
-                                                            shuffle=True)
-
+                                                           labels='inferred',
+                                                           label_mode='categorical',
+                                                           class_names=None,
+                                                           color_mode='rgb',
+                                                           batch_size=BATCH_SIZE,
+                                                           image_size=IMG_SIZE,
+                                                           shuffle=True,
+                                                           )
 ##
 class_names = train_dataset.class_names
 print(class_names)
 
+
 ##
 # plot example images from dataset with label 0=face, 1=noFace
-plt.figure(figsize=(12, 12))
+plt.figure(figsize=(20, 20))
 for images, labels in train_dataset.take(1):
     for i in range(25):
-        ax = plt.subplot(5, 5, i + 1)
+        ax = plt.subplot(5,5,i+1)
+
         plt.imshow(images[i].numpy().astype("uint8"))
         plt.title(labels[i].numpy().astype('uint8'))
         plt.axis("off")
@@ -60,7 +65,7 @@ plt.show()
 ##
 AUTOTUNE = tf.data.AUTOTUNE
 train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
-validation_dataset = val_dataset.prefetch(buffer_size=AUTOTUNE)
+validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
 test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
 
 
@@ -96,7 +101,7 @@ x = base_model(x)
 x = tf.keras.layers.Flatten()(x)
 x = tf.keras.layers.Dense(1280, activation='relu')(x)
 x = tf.keras.layers.Dropout(0.2)(x)  # Regularize with dropout
-outputs = tf.keras.layers.Dense(11, activation='softmax')(x)
+outputs = tf.keras.layers.Dense(15, activation='softmax')(x)
 model = tf.keras.Model(inputs, outputs)
 
 model.summary()
@@ -108,7 +113,6 @@ base_learning_rate = 0.0001
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
               loss=tf.keras.losses.CategoricalCrossentropy(),
               metrics=['accuracy'])
-
 
 ##
 # -- TRAIN THE MODEL ---------------------------------------------------------------------------------------------------
@@ -124,9 +128,7 @@ val_acc = history.history['val_accuracy']
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
-
 hist_df = pd.DataFrame(history.history)
 hist_csv_file = 'history.csv'
 with open(hist_csv_file, mode='w') as f:
     hist_df.to_csv(f)
-

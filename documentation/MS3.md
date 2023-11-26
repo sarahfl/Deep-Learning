@@ -1,6 +1,6 @@
 ## Option 1: Train-Val-Test Datenset
 
-Link: https://drive.google.com/file/d/12UN07y4s50ACBBhX1upgLSUILKn8vYaF/view?usp=drive_link
+Link: https://drive.google.com/file/d/1mwWyEk01DbcwPU0sgHkCrUhkNeDJz3Si/view?usp=sharing
 
 Face: Alter_Geschlecht_Face_id.jpg
 Geschelcht: 1 = Weiblich, 0 = Männlich
@@ -22,3 +22,20 @@ age3: Erwachsene
 age4: Erwachsene
 age5: Erste Zeichen des Alterns
 age6: graue Haare, eingefallene Haut
+
+# Es ergeben sich folgende Klassen:
+- male_age0
+- female_age0
+- male_age1
+- female_age1
+- male_age2
+- female_age2
+- male_age3
+- female_age3
+- male_age4
+- female_age4
+- male_age5
+- female_age5
+- male_age6
+- female_age6
+- noFace

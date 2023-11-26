@@ -113,30 +113,7 @@ def splitTrainValTest():
         "/home/sarah/Desktop/MS3_Train_Val_Test", train=0.8, test=0.1, val=0.1)
 
 
-def createGenderSplit():
-    # get the path/directory
-    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/UTKFace"
-    path_out_male = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/male"
-    path_out_female = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/female"
-
-    for image in tqdm(os.listdir(path_in)):
-        input_image = os.path.join(path_in, image)
-        # read image
-        img = cv2.imread(input_image)
-
-        # split image name
-        image_split = image.split("_")
-
-        if (image_split[1] == '0'):  # if male
-            # save image to new folder
-            cv2.imwrite(os.path.join(path_out_male, image), img)
-            cv2.waitKey(0)
-        elif (image_split[1] == '1'):  # if female
-            cv2.imwrite(os.path.join(path_out_female, image), img)
-            cv2.waitKey(0)
-
-
-def createAgeSplit():
+def createAgeGenderSplit():
     # get the path/directory
     path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/UTKFace"
     path_out = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/"
@@ -159,33 +136,65 @@ def createAgeSplit():
 
         age = int(image_split[0])
 
-        if 1 <= age <= 2:
-            path = os.path.join(path_out, 'age0')
+        # male = 0
+        # female = 1
+        gender = int(image_split[1])
+
+        if 1 <= age <= 2 and gender == 0:
+            path = os.path.join(path_out, 'male_age0')
             cv2.imwrite(os.path.join(path, image), img)
             cv2.waitKey(0)
-        elif 3 <= age <= 9:
-            path = os.path.join(path_out, 'age1')
+        elif 1 <= age <= 2 and gender == 1:
+            path = os.path.join(path_out, 'female_age0')
             cv2.imwrite(os.path.join(path, image), img)
             cv2.waitKey(0)
-        elif 10 <= age <= 20:
-            path = os.path.join(path_out, 'age2')
+        elif 3 <= age <= 9 and gender == 0:
+            path = os.path.join(path_out, 'male_age1')
             cv2.imwrite(os.path.join(path, image), img)
             cv2.waitKey(0)
-        elif 21 <= age <= 27:
-            path = os.path.join(path_out, 'age3')
+        elif 3 <= age <= 9 and gender == 1:
+            path = os.path.join(path_out, 'female_age1')
             cv2.imwrite(os.path.join(path, image), img)
             cv2.waitKey(0)
-        elif 28 <= age <= 45:
-            path = os.path.join(path_out, 'age4')
+        elif 10 <= age <= 20 and gender == 0:
+            path = os.path.join(path_out, 'male_age2')
             cv2.imwrite(os.path.join(path, image), img)
             cv2.waitKey(0)
-        elif 46 <= age <= 65:
-            path = os.path.join(path_out, 'age5')
+        elif 10 <= age <= 20 and gender == 1:
+            path = os.path.join(path_out, 'female_age2')
             cv2.imwrite(os.path.join(path, image), img)
             cv2.waitKey(0)
-        elif 66 <= age <= 116:
-            path = os.path.join(path_out, 'age6')
+        elif 21 <= age <= 27 and gender == 0:
+            path = os.path.join(path_out, 'male_age3')
+            cv2.imwrite(os.path.join(path, image), img)
+            cv2.waitKey(0)
+        elif 21 <= age <= 27 and gender == 1:
+            path = os.path.join(path_out, 'female_age3')
+            cv2.imwrite(os.path.join(path, image), img)
+            cv2.waitKey(0)
+        elif 28 <= age <= 45 and gender == 0:
+            path = os.path.join(path_out, 'male_age4')
+            cv2.imwrite(os.path.join(path, image), img)
+            cv2.waitKey(0)
+        elif 28 <= age <= 45 and gender == 1:
+            path = os.path.join(path_out, 'female_age4')
+            cv2.imwrite(os.path.join(path, image), img)
+            cv2.waitKey(0)
+        elif 46 <= age <= 65 and gender == 0:
+            path = os.path.join(path_out, 'male_age5')
+            cv2.imwrite(os.path.join(path, image), img)
+            cv2.waitKey(0)
+        elif 46 <= age <= 65 and gender == 1:
+            path = os.path.join(path_out, 'female_age5')
+            cv2.imwrite(os.path.join(path, image), img)
+            cv2.waitKey(0)
+        elif 66 <= age <= 116 and gender == 0:
+            path = os.path.join(path_out, 'male_age6')
+            cv2.imwrite(os.path.join(path, image), img)
+            cv2.waitKey(0)
+        elif 66 <= age <= 116 and gender == 1:
+            path = os.path.join(path_out, 'female_age6')
             cv2.imwrite(os.path.join(path, image), img)
             cv2.waitKey(0)
 
-createAgeSplit()
+
