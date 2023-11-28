@@ -23,6 +23,7 @@ Age Classe:
 - age4: 28-45 Jahre
 - age5: 46-65 Jahre
 - age6: 66-116 Jahre
+- age7: keine Zuordnung
 
 Erklärung der Age Classes:
 age0: meistens keine Haare, kaum Zähne
@@ -32,6 +33,15 @@ age3: Erwachsene
 age4: Erwachsene
 age5: Erste Zeichen des Alterns
 age6: graue Haare, eingefallene Haut
+
+Codierung:
+Männlich = 0
+Weiblich = 1
+Kein Geschlecht = 3
+
+face = 0
+noFace = 1
+
 
 ## Option 2: Multi-Task-Learning als Multi-Output-Regression
 TODO: Xaver

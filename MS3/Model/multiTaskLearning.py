@@ -6,16 +6,23 @@ import os
 import numpy as np
 from tensorflow.keras.callbacks import EarlyStopping
 
+##
+# -- GET DATA ----------------------------------------------------------------------------------------------------------
+df_face = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/UTKFace.csv')
+df_noFace = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/noFace.csv')
+
+df = pd.concat([df_face, df_noFace], axis=0, ignore_index=True)
+print(df)
+
 
 ##
-# -- GET DATA
+# -- MAKE DATASET ------------------------------------------------------------------------------------------------------
+def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
+    img = tf.image.decode_jpeg(tf.io.read_file(image_path), channels=3)
+    return img, {'age_output': label_age, 'gender_output': label_gender, 'face_output': label_face}
 
-
-
-
-train_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/train'
-val_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val'
-test_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/test'
+dataset = tf.data.Dataset.from_tensor_slices((df['path'].values, df['age'].values, df['gender'], df['face']))
+##
 
 BATCH_SIZE = 32
 IMG_SIZE = (200, 200)

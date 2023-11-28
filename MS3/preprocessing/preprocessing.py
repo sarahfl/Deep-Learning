@@ -330,7 +330,23 @@ def createDataFrameFace():
         age = int(image_split[0])
         gender = int(image_split[1])
 
-        df = df._append({'path': input_image, 'age': age, 'gender': gender, 'face': 0}, ignore_index=True)
+        result = ''
+        if 1 <= age <= 2:
+            result = 'age0'
+        elif 3 <= age <= 9:
+            result = 'age1'
+        elif 10 <= age <= 20:
+            result = 'age2'
+        elif 21 <= age <= 27:
+            result = 'age3'
+        elif 28 <= age <= 45:
+            result = 'age4'
+        elif 46 <= age <= 65:
+            result = 'age5'
+        elif 66 <= age <= 116:
+            result = 'age6'
+
+        df = df._append({'path': input_image, 'age': result, 'gender': gender, 'face': 0}, ignore_index=True)
 
     df.to_csv('UTKFace.csv', sep='\t')
 
@@ -342,7 +358,7 @@ def createDataFramaNoFace():
     for image in tqdm(os.listdir(path_in)):
         input_image = os.path.join(path_in, image)
 
-        df = df._append({'path': input_image, 'age': 0, 'gender': 3, 'face': 1}, ignore_index=True)
+        df = df._append({'path': input_image, 'age': 'age7', 'gender': 3, 'face': 1}, ignore_index=True)
 
     df.to_csv('noFace.csv', sep='\t')
 
