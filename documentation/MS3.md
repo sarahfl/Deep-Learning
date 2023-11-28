@@ -1,10 +1,20 @@
-## Option 1: Train-Val-Test Datenset
+## Raw Data
+Link: https://drive.google.com/file/d/1Z-lu2npV4vGvAYm1OiawZG05VRU13W8w/view?usp=sharing
 
-Link: https://drive.google.com/file/d/1mwWyEk01DbcwPU0sgHkCrUhkNeDJz3Si/view?usp=sharing
+Info zum Ordner UTKFace: Die Bilder sind wie folgt codiert: <br>
+{alter}_{geschlecht}_face_{id}.jpg <br>
+Alter: [0...116]<br>
+Geschlecht: [0,1], wobei 0 = männlich und 1 = weiblich <br>
 
-Face: Alter_Geschlecht_Face_id.jpg
-Geschelcht: 1 = Weiblich, 0 = Männlich
+# Aufgabe: Multi-Task-Learning
+## Option 1: Multi-Task-Learning als Klassifikationsproblem mit diskreten Altersklassen
 
+### NoFace-Klasse
+
+### Gender-Klasse
+Geschelcht:  0 = Männlich, 1 = Weiblich
+
+### Age-Klasse
 Age Classe:
 - age0: 1-2 Jahre
 - age1: 3-9 Jahre
@@ -23,19 +33,6 @@ age4: Erwachsene
 age5: Erste Zeichen des Alterns
 age6: graue Haare, eingefallene Haut
 
-# Es ergeben sich folgende Klassen:
-- male_age0
-- female_age0
-- male_age1
-- female_age1
-- male_age2
-- female_age2
-- male_age3
-- female_age3
-- male_age4
-- female_age4
-- male_age5
-- female_age5
-- male_age6
-- female_age6
-- noFace
+## Option 2: Multi-Task-Learning als Multi-Output-Regression
+TODO: Xaver
+

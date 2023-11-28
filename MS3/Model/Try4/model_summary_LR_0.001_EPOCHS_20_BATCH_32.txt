@@ -1,0 +1,39 @@
+Model: "model"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_2 (InputLayer)        [(None, 200, 200, 3)]     0         
+                                                                 
+ sequential (Sequential)     (None, 200, 200, 3)       0         
+                                                                 
+ tf.math.truediv (TFOpLambd  (None, 200, 200, 3)       0         
+ a)                                                              
+                                                                 
+ tf.math.subtract (TFOpLamb  (None, 200, 200, 3)       0         
+ da)                                                             
+                                                                 
+ mobilenetv2_1.00_224 (Func  (None, 7, 7, 1280)        2257984   
+ tional)                                                         
+                                                                 
+ batch_normalization (Batch  (None, 7, 7, 1280, renorm=True)        8960
+ Normalization)                                                  
+                                                                 
+ global_average_pooling2d (  (None, 1280)              0         
+ GlobalAveragePooling2D)                                         
+                                                                 
+ dense (Dense)               (None, 512, relu)               655872
+                                                                 
+ dense_1 (Dense)             (None, 256,relu)               131328
+                                                                 
+ dropout (Dropout)           (None, 256, 0.5)               0
+                                                                 
+ dense_2 (Dense)             (None, 128, relu)               32896
+                                                                 
+ dense_3 (Dense)             (None, 15, softmax)                1935
+                                                                 
+=================================================================
+Total params: 3088975 (11.78 MB)
+Trainable params: 824591 (3.15 MB)
+Non-trainable params: 2264384 (8.64 MB)
+_________________________________________________________________
+Trainable Variables:  10

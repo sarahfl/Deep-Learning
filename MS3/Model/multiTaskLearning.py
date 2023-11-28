@@ -49,13 +49,12 @@ test_dataset = tf.keras.utils.image_dataset_from_directory(test_dir,
 class_names = train_dataset.class_names
 print(class_names)
 
-
 ##
 # plot example images from dataset with label 0=face, 1=noFace
 plt.figure(figsize=(20, 20))
 for images, labels in train_dataset.take(1):
     for i in range(25):
-        ax = plt.subplot(5,5,i+1)
+        ax = plt.subplot(5, 5, i + 1)
 
         plt.imshow(images[i].numpy().astype("uint8"))
         plt.title(labels[i].numpy().astype('uint8'))
@@ -68,14 +67,12 @@ train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
 validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
 test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
 
-
 ##
 # -- DATA AUGMENTATION -------------------------------------------------------------------------------------------------
 data_augmentation = tf.keras.Sequential([
     tf.keras.layers.RandomFlip('horizontal'),
     tf.keras.layers.RandomRotation(0.2)
 ])
-
 ##
 # -- CREATE BASE MODEL -------------------------------------------------------------------------------------------------
 IMG_SHAPE = IMG_SIZE + (3,)
@@ -89,6 +86,7 @@ base_model.summary()
 print(len(base_model.trainable_variables))
 
 base_model.trainable = False
+
 ##
 # -- CREATE NEW MODEL ON TOP -------------------------------------------------------------------------------------------
 preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
@@ -99,36 +97,32 @@ x = data_augmentation(inputs)
 x = preprocess_input(x)
 x = base_model(x)
 
-x = tf.keras.layers.BatchNormalization(renorm=True)(x)
-x = tf.keras.layers.GlobalAveragePooling2D()(x)
-x = tf.keras.layers.Dense(928, activation='relu')(x)
-x = tf.keras.layers.Dense(512, activation='relu')(x)
-x = tf.keras.layers.Dense(256, activation='relu')(x)
 x = tf.keras.layers.Dense(128, activation='relu')(x)
-x = tf.keras.layers.Dropout(0.5)(x)
-x = tf.keras.layers.Dense(56, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)
-outputs = tf.keras.layers.Dense(15, activation='softmax')(x)
-model = tf.keras.Model(inputs, outputs)
+
+# age prediction
+age_prediction = tf.keras.layers.Dense(num_age_classes, name='age_output', activation='softmax')(x)
+
+# gender prediction
+gender_prediction = tf.keras.layers.Dense(1, name='gender_output', activation='sigmoid')(x)
+
+model = tf.keras.Model(inputs, [age_prediction, gender_prediction])
 
 model.summary()
 print("Trainable Variables: ", len(model.trainable_variables))
-
 
 ##
 # -- COMPILE THE MODEL -------------------------------------------------------------------------------------------------
 base_learning_rate = 0.0001
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
-              loss=tf.keras.losses.CategoricalCrossentropy(),
-              metrics=['accuracy'])
+              loss={'age_output': tf.keras.losses.CategoricalCrossentropy(),
+                    'gender_output': tf.keras.losses.BinaryCrossentropy()},
+              metrics={'age_output': 'accuracy', 'gender_output': 'accuracy'})
 
 ##
 # save model summary to file
 with open('model_summary_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE), 'w') as f:
     model.summary(print_fn=lambda x: f.write(x + '\n'))
 
-##
-# Definiere den Early Stopping Callback
-# early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 ##
 # -- TRAIN THE MODEL ---------------------------------------------------------------------------------------------------
 history = model.fit(train_dataset,
