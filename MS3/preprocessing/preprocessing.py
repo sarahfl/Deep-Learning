@@ -348,7 +348,7 @@ def createDataFrameFace():
 
         df = df._append({'path': input_image, 'age': result, 'gender': gender, 'face': 0}, ignore_index=True)
 
-    df.to_csv('UTKFace.csv', sep='\t')
+    df.to_csv('UTKFace.csv')
 
 def createDataFramaNoFace():
     # get the path/directory
@@ -360,5 +360,7 @@ def createDataFramaNoFace():
 
         df = df._append({'path': input_image, 'age': 'age7', 'gender': 3, 'face': 1}, ignore_index=True)
 
-    df.to_csv('noFace.csv', sep='\t')
+    df.to_csv('noFace.csv')
 
+createDataFrameFace()
+createDataFramaNoFace()
