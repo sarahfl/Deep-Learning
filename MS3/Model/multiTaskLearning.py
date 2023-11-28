@@ -2,15 +2,25 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
+import os
+import numpy as np
 from tensorflow.keras.callbacks import EarlyStopping
 
-train_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/MS3_Train_Test_Folder/train'
-val_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/MS3_Train_Test_Folder/val'
-test_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/MS3_Train_Test_Folder/test'
+
+##
+# -- GET DATA
+
+
+
+
+train_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/train'
+val_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val'
+test_dir = '/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/test'
 
 BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
 EPOCHS = 50
+num_age_classes = 7
 
 ##
 # -- TRAINING DATA -----------------------------------------------------------------------------------------------------

@@ -60,8 +60,8 @@ def classDistribution():
 
 def copyImageas():
     # get the path/directory
-    path_in = "/home/sarah/Desktop/Train_Test_Folder_2/train/noFace"
-    path_out = "/home/sarah/Desktop/noFace"
+    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/noFace"
+    path_out = "/home/sarah/Deep-Learning/MS3/preprocessing/Data"
 
     for image in tqdm(os.listdir(path_in)):
         input_image = os.path.join(path_in, image)
@@ -315,4 +315,34 @@ def createAgeGenderSplit():
             cv2.imwrite(os.path.join(path, image), img)
             cv2.waitKey(0)
 
-classDistribution()
+
+def createDataFrameFace():
+    # get the path/directory
+    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/UTKFace"
+    df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
+
+    for image in tqdm(os.listdir(path_in)):
+        input_image = os.path.join(path_in, image)
+
+        # split image name
+        image_split = image.split("_")
+
+        age = int(image_split[0])
+        gender = int(image_split[1])
+
+        df = df._append({'path': input_image, 'age': age, 'gender': gender, 'face': 0}, ignore_index=True)
+
+    df.to_csv('UTKFace.csv', sep='\t')
+
+def createDataFramaNoFace():
+    # get the path/directory
+    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/noFace"
+    df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
+
+    for image in tqdm(os.listdir(path_in)):
+        input_image = os.path.join(path_in, image)
+
+        df = df._append({'path': input_image, 'age': 0, 'gender': 3, 'face': 1}, ignore_index=True)
+
+    df.to_csv('noFace.csv', sep='\t')
+
