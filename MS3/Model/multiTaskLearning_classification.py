@@ -18,7 +18,7 @@ def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
 ##
 BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
-EPOCHS = 50
+EPOCHS = 10
 IMG_SHAPE = IMG_SIZE + (3,)
 
 ##
@@ -66,6 +66,8 @@ val_dataset = dataset.skip(train_size).take(val_size)
 test_dataset = dataset.skip(train_size + val_size)
 
 train_dataset = train_dataset.batch(BATCH_SIZE, drop_remainder=True)
+val_dataset = val_dataset.batch(BATCH_SIZE, drop_remainder=True)
+test_dataset = test_dataset.batch(BATCH_SIZE, drop_remainder=True)
 
 ##
 AUTOTUNE = tf.data.AUTOTUNE
@@ -98,7 +100,7 @@ output_age = tf.keras.layers.Dense(8, activation='softmax', name='age_output')(x
 output_gender = tf.keras.layers.Dense(3, activation='softmax', name='gender_output')(x)
 
 # OUTPUT FACE
-output_face = tf.keras.layers.Dense(1, name='face_output')(x)
+output_face = tf.keras.layers.Dense(2, activation='softmax', name='face_output')(x)
 
 # COMBINE
 model = tf.keras.Model(inputs, [output_age, output_gender, output_face])
@@ -131,17 +133,58 @@ history = model.fit(train_dataset,
                     batch_size=BATCH_SIZE,
                     validation_data=validation_dataset)
 
-##
-acc = history.history['accuracy']
-val_acc = history.history['val_accuracy']
 
-loss = history.history['loss']
-val_loss = history.history['val_loss']
+## -- SAVE HISTORY AND MODEL -------------------------------------------------------------------------------------------
+# Training-History für jede Ausgabe speichern
+history_age = history.history['age_output_accuracy']
+val_history_age = history.history['val_age_output_accuracy']
+loss_age = history.history['age_output_loss']
+val_loss_age = history.history['val_age_output_loss']
 
-hist_df = pd.DataFrame(history.history)
-hist_csv_file = 'history.csv'
-with open(hist_csv_file, mode='w') as f:
-    hist_df.to_csv(f)
+history_gender = history.history['gender_output_accuracy']
+val_history_gender = history.history['val_gender_output_accuracy']
+loss_gender = history.history['gender_output_loss']
+val_loss_gender = history.history['val_gender_output_loss']
 
-# save the model
+history_face = history.history['face_output_accuracy']
+val_history_face = history.history['val_face_output_accuracy']
+loss_face = history.history['face_output_loss']
+val_loss_face = history.history['val_face_output_loss']
+
+# DataFrames für jede Ausgabe erstellen
+hist_df_age = pd.DataFrame({
+    'accuracy': history_age,
+    'val_accuracy': val_history_age,
+    'loss': loss_age,
+    'val_loss': val_loss_age
+})
+
+hist_df_gender = pd.DataFrame({
+    'accuracy': history_gender,
+    'val_accuracy': val_history_gender,
+    'loss': loss_gender,
+    'val_loss': val_loss_gender
+})
+
+hist_df_face = pd.DataFrame({
+    'accuracy': history_face,
+    'val_accuracy': val_history_face,
+    'loss': loss_face,
+    'val_loss': val_loss_face
+})
+
+# CSV-Dateien für jede Ausgabe speichern
+hist_csv_file_age = 'history_age.csv'
+with open(hist_csv_file_age, mode='w') as f_age:
+    hist_df_age.to_csv(f_age)
+
+hist_csv_file_gender = 'history_gender.csv'
+with open(hist_csv_file_gender, mode='w') as f_gender:
+    hist_df_gender.to_csv(f_gender)
+
+hist_csv_file_face = 'history_face.csv'
+with open(hist_csv_file_face, mode='w') as f_face:
+    hist_df_face.to_csv(f_face)
+
+
 model.save('/home/sarah/Deep-Learning/MS3/model.keras')
