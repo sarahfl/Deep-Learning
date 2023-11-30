@@ -3,7 +3,7 @@ Link: https://drive.google.com/file/d/1Z-lu2npV4vGvAYm1OiawZG05VRU13W8w/view?usp
 
 Info zum Ordner UTKFace: Die Bilder sind wie folgt codiert: <br>
 {alter}_{geschlecht}_face_{id}.jpg <br>
-Alter: [0...116]<br>
+Alter: [1...116]<br>
 Geschlecht: [0,1], wobei 0 = männlich und 1 = weiblich <br>
 
 # Aufgabe: Multi-Task-Learning
