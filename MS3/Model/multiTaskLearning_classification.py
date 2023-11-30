@@ -30,8 +30,8 @@ IMG_SHAPE = IMG_SIZE + (3,)
 
 ##
 # -- GET DATA ----------------------------------------------------------------------------------------------------------
-df_face = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/UTKFace.csv', index_col=0)
-df_noFace = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/noFace.csv', index_col=0)
+df_face = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/Data/Face_classification.csv', index_col=0)
+df_noFace = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/Data/noFace_classification.csv', index_col=0)
 df = pd.concat([df_face, df_noFace], axis=0, ignore_index=True)
 
 # shuffle dataframe
