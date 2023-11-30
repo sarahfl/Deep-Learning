@@ -9,13 +9,11 @@ Geschlecht: [0,1], wobei 0 = männlich und 1 = weiblich <br>
 # Aufgabe: Multi-Task-Learning
 ## Option 1: Multi-Task-Learning als Klassifikationsproblem mit diskreten Altersklassen
 
-### NoFace-Klasse
+gender = [0,1,3], wobei 0=männlich, 1=weiblich, 3=kein Geschlecht
 
-### Gender-Klasse
-Geschelcht:  0 = Männlich, 1 = Weiblich
+face = [0,1], wobei 0=Gesicht, 1=kein Gesicht
 
-### Age-Klasse
-Age Classe:
+age = [age0,age1,age2,age3,age4,age5,age6,age7], wobei
 - age0: 1-2 Jahre
 - age1: 3-9 Jahre
 - age2: 10-20 Jahre
@@ -34,15 +32,13 @@ age4: Erwachsene
 age5: Erste Zeichen des Alterns
 age6: graue Haare, eingefallene Haut
 
-Codierung:
-Männlich = 0
-Weiblich = 1
-Kein Geschlecht = 3
-
-face = 0
-noFace = 1
 
 
 ## Option 2: Multi-Task-Learning als Multi-Output-Regression
-TODO: Xaver
+
+gender = [0,1,3], wobei 0=männlich, 1=weiblich, 3=kein Geschlecht
+
+face = [0,1], wobei 0=Gesicht, 1=kein Gesicht
+
+age = [1,116], wobei 0=Alter kann nicht zugeordnet werden
 
