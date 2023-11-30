@@ -4,7 +4,6 @@ from tqdm import tqdm
 from collections import Counter
 import matplotlib.pyplot as plt
 import numpy as np
-import python_splitter
 import pandas as pd
 
 
@@ -136,187 +135,8 @@ def genderDistribution():
     plt.show()
 
 
-def splitTrainValTest():
-    # https://github.com/bharatadk/python_splitter
-    python_splitter.split_from_folder(
-        "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData", train=0.8, test=0.1, val=0.1)
 
-
-def createAgeSplit():
-    # get the path/directory
-    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/UTKFace"
-    path_out = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/"
-
-    for image in tqdm(os.listdir(path_in)):
-        input_image = os.path.join(path_in, image)
-        # read image
-        img = cv2.imread(input_image)
-
-        # split image name
-        image_split = image.split("_")
-
-        # age0: 1 - 2 Jahre
-        # age1: 3 - 9 Jahre
-        # age2: 10 - 20 Jahre
-        # age3: 21 - 27 Jahre
-        # age4: 28 - 45 Jahre
-        # age5: 46 - 65 Jahre
-        # age6: 66 - 116 Jahre
-
-        age = int(image_split[0])
-
-        if 1 <= age <= 2:
-            path = os.path.join(path_out, 'age0')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 3 <= age <= 9:
-            path = os.path.join(path_out, 'age1')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 10 <= age <= 20:
-            path = os.path.join(path_out, 'age2')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 21 <= age <= 27:
-            path = os.path.join(path_out, 'age3')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 28 <= age <= 45:
-            path = os.path.join(path_out, 'age4')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 46 <= age <= 65:
-            path = os.path.join(path_out, 'age5')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 66 <= age <= 116:
-            path = os.path.join(path_out, 'age6')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-
-
-def createGenderSplit():
-    # get the path/directory
-    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/UTKFace"
-    path_out = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/"
-
-    for image in tqdm(os.listdir(path_in)):
-        input_image = os.path.join(path_in, image)
-        # read image
-        img = cv2.imread(input_image)
-
-        # split image name
-        image_split = image.split("_")
-
-        # male = 0
-        # female = 1
-        gender = int(image_split[1])
-
-        if gender == 0:
-            path = os.path.join(path_out, 'male')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif gender == 1:
-            path = os.path.join(path_out, 'female')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-
-
-def createSubfolders():
-    parent_folder = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/train"
-    subfolder_names = ["male", "female", "age0", "age1", "age2", "age3", "age4", "age5", "age6"]
-    for subfolder_name in subfolder_names:
-        subfolder_path = os.path.join(parent_folder, subfolder_name)
-        os.makedirs(subfolder_path)
-        print(f"Unterordner '{subfolder_name}' wurde erstellt in '{parent_folder}'.")
-
-
-def createAgeGenderSplit():
-    # get the path/directory
-    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/UTKFace"
-    path_out = "/home/sarah/Deep-Learning/MS3/preprocessing/Train_Test_Folder/val/"
-
-    for image in tqdm(os.listdir(path_in)):
-        input_image = os.path.join(path_in, image)
-        # read image
-        img = cv2.imread(input_image)
-
-        # split image name
-        image_split = image.split("_")
-
-        # age0: 1 - 2 Jahre
-        # age1: 3 - 9 Jahre
-        # age2: 10 - 20 Jahre
-        # age3: 21 - 27 Jahre
-        # age4: 28 - 45 Jahre
-        # age5: 46 - 65 Jahre
-        # age6: 66 - 116 Jahre
-
-        age = int(image_split[0])
-
-        # male = 0
-        # female = 1
-        gender = int(image_split[1])
-
-        if 1 <= age <= 2 and gender == 0:
-            path = os.path.join(path_out, 'male_age0')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 1 <= age <= 2 and gender == 1:
-            path = os.path.join(path_out, 'female_age0')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 3 <= age <= 9 and gender == 0:
-            path = os.path.join(path_out, 'male_age1')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 3 <= age <= 9 and gender == 1:
-            path = os.path.join(path_out, 'female_age1')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 10 <= age <= 20 and gender == 0:
-            path = os.path.join(path_out, 'male_age2')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 10 <= age <= 20 and gender == 1:
-            path = os.path.join(path_out, 'female_age2')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 21 <= age <= 27 and gender == 0:
-            path = os.path.join(path_out, 'male_age3')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 21 <= age <= 27 and gender == 1:
-            path = os.path.join(path_out, 'female_age3')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 28 <= age <= 45 and gender == 0:
-            path = os.path.join(path_out, 'male_age4')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 28 <= age <= 45 and gender == 1:
-            path = os.path.join(path_out, 'female_age4')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 46 <= age <= 65 and gender == 0:
-            path = os.path.join(path_out, 'male_age5')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 46 <= age <= 65 and gender == 1:
-            path = os.path.join(path_out, 'female_age5')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 66 <= age <= 116 and gender == 0:
-            path = os.path.join(path_out, 'male_age6')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-        elif 66 <= age <= 116 and gender == 1:
-            path = os.path.join(path_out, 'female_age6')
-            cv2.imwrite(os.path.join(path, image), img)
-            cv2.waitKey(0)
-
-
-def createDataFrameFace():
+def createFaceCSV_classification():
     # get the path/directory
     path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/UTKFace"
     df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
@@ -348,9 +168,10 @@ def createDataFrameFace():
 
         df = df._append({'path': input_image, 'age': result, 'gender': gender, 'face': 0}, ignore_index=True)
 
-    df.to_csv('UTKFace.csv')
+    df.to_csv('Data/Face_classification.csv')
 
-def createDataFramaNoFace():
+
+def createNoFaceCSV_classification():
     # get the path/directory
     path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/noFace"
     df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
@@ -360,7 +181,39 @@ def createDataFramaNoFace():
 
         df = df._append({'path': input_image, 'age': 'age7', 'gender': 3, 'face': 1}, ignore_index=True)
 
-    df.to_csv('noFace.csv')
+    df.to_csv('Data/noFace_classification.csv')
 
-createDataFrameFace()
-createDataFramaNoFace()
+
+def createFaceCSV_regression():
+    # get the path/directory
+    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/UTKFace"
+    df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
+
+    for image in tqdm(os.listdir(path_in)):
+        input_image = os.path.join(path_in, image)
+
+        # split image name
+        image_split = image.split("_")
+
+        age = int(image_split[0])
+        gender = int(image_split[1])
+
+        df = df._append({'path': input_image, 'age': age, 'gender': gender, 'face': 0}, ignore_index=True)
+
+    df.to_csv('Data/Face_regression.csv')
+
+def createNoFaceCSV_regression():
+    # get the path/directory
+    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/noFace"
+    df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
+
+    for image in tqdm(os.listdir(path_in)):
+        input_image = os.path.join(path_in, image)
+
+        df = df._append({'path': input_image, 'age': '0', 'gender': 3, 'face': 1}, ignore_index=True)
+
+    df.to_csv('Data/noFace_regression.csv')
+
+
+createFaceCSV_regression()
+createNoFaceCSV_regression()
