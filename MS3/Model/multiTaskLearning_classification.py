@@ -1,34 +1,39 @@
 ##
-from random import shuffle
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
 import os
 import numpy as np
 
+modelType = 'model1'
+
 
 def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
-    # Lade das Bild
-    img = tf.image.decode_jpeg(tf.io.read_file(image_path), channels=3)
-    img = tf.image.resize(img, [200, 200])
+    """
+    Apply tensor transformation on image.
+    :param image_path: absolut path to file
+    :param label_age: output channel age
+    :param label_gender: output channel gender
+    :param label_face: output channel face
+    :return: Image as 3D tensor and dictionary of labels which includes the mapping of labels to output channels
+    """
+    img = tf.image.decode_jpeg(tf.io.read_file(image_path), channels=3)  # image to tensor
+    img = tf.image.resize(img, [200, 200])  # define image size
     return img, {'age_output': label_age, 'gender_output': label_gender, 'face_output': label_face}
 
 
 ##
 BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
-EPOCHS = 10
+EPOCHS = 20
 IMG_SHAPE = IMG_SIZE + (3,)
 
 ##
 # -- GET DATA ----------------------------------------------------------------------------------------------------------
 df_face = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/UTKFace.csv', index_col=0)
 df_noFace = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/noFace.csv', index_col=0)
-
 df = pd.concat([df_face, df_noFace], axis=0, ignore_index=True)
 
-print(df.head())
 # shuffle dataframe
 train_df = df.sample(frac=1)
 
@@ -52,11 +57,11 @@ dataset = tf.data.Dataset.from_tensor_slices(
     (train_df['path'].values, one_hot_age, one_hot_gender, one_hot_face))
 
 dataset = dataset.map(load_and_preprocess_image)
-print(dataset.element_spec)
-
+print('Aufbau des Datensets: ', dataset.element_spec)
 
 ##
 # -- SPLIT DATASET INTO TRAIN, VAL AND TEST ----------------------------------------------------------------------------
+# train=0.8, validation=0.1, test=0.1
 train_size = int(0.8 * dataset_size)
 val_size = int(0.1 * dataset_size)
 test_size = dataset_size - train_size - val_size
@@ -76,18 +81,27 @@ validation_dataset = val_dataset.prefetch(buffer_size=AUTOTUNE)
 test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
 
 ##
+# -- DATA AUGMENTATION -------------------------------------------------------------------------------------------------
+data_augmentation = tf.keras.Sequential([
+    tf.keras.layers.RandomFlip('horizontal'),
+    tf.keras.layers.RandomRotation(0.2),
+])
+
+##
 # -- BASE MODEL MOBILENETV2 --------------------------------------------------------------------------------------------
 base_model = tf.keras.applications.MobileNetV2(weights='imagenet', include_top=False, input_shape=IMG_SHAPE)
 base_model.summary()
-print(len(base_model.trainable_variables))
+print('Anzahl der trainierbaren Variablen: ', len(base_model.trainable_variables))
 
 base_model.trainable = False
 
 ##
 # -- CUSTOM TOP LAYER --------------------------------------------------------------------------------------------------
 preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
+
 inputs = tf.keras.Input(shape=(200, 200, 3))
-x = preprocess_input(inputs)
+x = data_augmentation(inputs)
+x = preprocess_input(x)
 x = base_model(x, training=False)
 x = tf.keras.layers.GlobalAveragePooling2D()(x)
 x = tf.keras.layers.Dense(1280, activation='relu')(x)
@@ -117,15 +131,16 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rat
                        'face_output': 'accuracy'})
 
 model.summary()
-print(len(model.trainable_variables))
+print('Anzahl der trainierbaren Variablen: ', len(model.trainable_variables))
 
 # save model summary to file
-with open('model_summary_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(base_learning_rate, EPOCHS, BATCH_SIZE), 'w') as f:
+with open('{}/model_summary_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(modelType, base_learning_rate, EPOCHS, BATCH_SIZE),
+          'w') as f:
     model.summary(print_fn=lambda x: f.write(x + '\n'))
 
 ##
 # -- TRAIN THE MODEL ---------------------------------------------------------------------------------------------------
-# Definiere den Early Stopping Callback
+# Early Stopping Callback
 # early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 
 history = model.fit(train_dataset,
@@ -133,9 +148,9 @@ history = model.fit(train_dataset,
                     batch_size=BATCH_SIZE,
                     validation_data=validation_dataset)
 
-
-## -- SAVE HISTORY AND MODEL -------------------------------------------------------------------------------------------
-# Training-History für jede Ausgabe speichern
+##
+# -- SAVE HISTORY AND MODEL --------------------------------------------------------------------------------------------
+# save Training-History for each output channel
 history_age = history.history['age_output_accuracy']
 val_history_age = history.history['val_age_output_accuracy']
 loss_age = history.history['age_output_loss']
@@ -151,7 +166,7 @@ val_history_face = history.history['val_face_output_accuracy']
 loss_face = history.history['face_output_loss']
 val_loss_face = history.history['val_face_output_loss']
 
-# DataFrames für jede Ausgabe erstellen
+# make Dataframe for each output channel
 hist_df_age = pd.DataFrame({
     'accuracy': history_age,
     'val_accuracy': val_history_age,
@@ -173,18 +188,60 @@ hist_df_face = pd.DataFrame({
     'val_loss': val_loss_face
 })
 
-# CSV-Dateien für jede Ausgabe speichern
-hist_csv_file_age = 'history_age.csv'
+# save each Dataframe to csv
+hist_csv_file_age = '{}/history_age.csv'.format(modelType)
 with open(hist_csv_file_age, mode='w') as f_age:
     hist_df_age.to_csv(f_age)
 
-hist_csv_file_gender = 'history_gender.csv'
+hist_csv_file_gender = '{}/history_gender.csv'.format(modelType)
 with open(hist_csv_file_gender, mode='w') as f_gender:
     hist_df_gender.to_csv(f_gender)
 
-hist_csv_file_face = 'history_face.csv'
+hist_csv_file_face = '{}/history_face.csv'.format(modelType)
 with open(hist_csv_file_face, mode='w') as f_face:
     hist_df_face.to_csv(f_face)
 
+# save whole model
+model.save('/home/sarah/Deep-Learning/MS3/Model/{}/model.keras'.format(modelType))
 
-model.save('/home/sarah/Deep-Learning/MS3/model.keras')
+##
+# -- EVALUATE VALIDATION AND TEST DATA ---------------------------------------------------------------------------------
+eval_test = model.evaluate(test_dataset)
+eval_val = model.evaluate(validation_dataset)
+
+# Losses and Accuracies Test
+losses_test = eval_test[:3]
+accuracies_test = eval_test[3:]
+
+# Losses and Accuracies Validation
+losses_val = eval_val[:3]
+accuracies_val = eval_val[3:]
+
+df_test = pd.DataFrame({
+    'Loss Age': [losses_test[0]],
+    'Loss Gender': [losses_test[1]],
+    'Loss Face': [losses_test[2]],
+    'Accuracy Age': [accuracies_test[0]],
+    'Accuracy Gender': [accuracies_test[1]],
+    'Accuracy Face': [accuracies_test[2]]
+})
+
+df_val = pd.DataFrame({
+    'Loss Age': [losses_val[0]],
+    'Loss Gender': [losses_val[1]],
+    'Loss Face': [losses_val[2]],
+    'Accuracy Age': [accuracies_val[0]],
+    'Accuracy Gender': [accuracies_val[1]],
+    'Accuracy Face': [accuracies_val[2]]
+})
+
+print('Evalutation Validation ----------------------------')
+print(df_val)
+print('Evalutation Test ----------------------------------')
+print(df_test)
+
+# save to csv
+csv_file_test = '{}/test_metrics.csv'.format(modelType)
+csv_file_val = '{}/validation_metrics.csv'.format(modelType)
+df_test.to_csv(csv_file_test, index=False)
+df_val.to_csv(csv_file_val, index=False)
