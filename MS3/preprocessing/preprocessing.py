@@ -5,6 +5,8 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from PIL import Image
+from PIL.Image import Resampling
 
 
 def renameImages():
@@ -162,3 +164,21 @@ def createNoFaceCSV_regression():
         df = df._append({'path': input_image, 'age': '0', 'gender': 3, 'face': 1}, ignore_index=True)
 
     df.to_csv('Data/noFace_regression.csv')
+
+def resizePIL(image_url):
+    with Image.open(image_url) as im:
+        # Provide the target width and height of the image
+        (width, height) = (200, 200)
+        im_resized = im.resize((width, height), resample=Resampling.LANCZOS)
+        return im_resized
+
+
+path_in = "/home/sarah/Pictures/StarWars_cropped"
+path_out = "/MS3/prediction/StarWars"
+i = 0
+for image in tqdm(os.listdir(path_in)):
+    input_image = os.path.join(path_in, image)
+    resizedImage = resizePIL(input_image)
+    resizedImage.save(os.path.join(path_out, image))
+
+
