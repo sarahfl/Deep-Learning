@@ -1,13 +1,69 @@
 import cv2
 import os
 from tqdm import tqdm
-from collections import Counter
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 from PIL import Image
 from PIL.Image import Resampling
 
+
+def promisToCSV_classification():
+    path_to_prediction = '/home/sarah/Deep-Learning/MS3/prediction/deutschePromis'
+    df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
+    for image in os.listdir(path_to_prediction):
+        path = os.path.join(path_to_prediction, image)
+
+        image_split = image.split("_")
+        age = int(image_split[0])
+        gender = int(image_split[1])
+        name = image_split[2]
+
+        result = ''
+        if 1 <= age <= 2:
+            result = 'age0'
+        elif 3 <= age <= 9:
+            result = 'age1'
+        elif 10 <= age <= 20:
+            result = 'age2'
+        elif 21 <= age <= 27:
+            result = 'age3'
+        elif 28 <= age <= 45:
+            result = 'age4'
+        elif 46 <= age <= 65:
+            result = 'age5'
+        elif 66 <= age <= 116:
+            result = 'age6'
+        elif age == 0:
+            result = 'age7'
+
+        face = 0
+        if name == 'elmo.jpg':
+            face = 1
+        else:
+            face = 0
+
+        df = df._append({'path': path, 'age': result, 'gender': gender, 'face': face}, ignore_index=True)
+    df.to_csv('/home/sarah/Deep-Learning/MS3/prediction/deutschePromis_classification.csv')
+
+def promisToCSV_regression():
+    path_to_prediction = '/home/sarah/Deep-Learning/MS3/prediction/deutschePromis'
+    df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
+    for image in os.listdir(path_to_prediction):
+        path = os.path.join(path_to_prediction, image)
+
+        image_split = image.split("_")
+        age = int(image_split[0])
+        gender = int(image_split[1])
+        name = image_split[2]
+
+        face = 0
+        if name == 'elmo.jpg':
+            face = 1
+        else:
+            face = 0
+
+        df = df._append({'path': path, 'age': age, 'gender': gender, 'face': face}, ignore_index=True)
+    df.to_csv('/home/sarah/Deep-Learning/MS3/prediction/deutschePromis_regression.csv')
 
 def renameImages():
     # get the path/directory
@@ -131,7 +187,7 @@ def createNoFaceCSV_classification():
     for image in tqdm(os.listdir(path_in)):
         input_image = os.path.join(path_in, image)
 
-        df = df._append({'path': input_image, 'age': 'age7', 'gender': 3, 'face': 1}, ignore_index=True)
+        df = df._append({'path': input_image, 'age': 'age7', 'gender': 2, 'face': 1}, ignore_index=True)
 
     df.to_csv('Data/noFace_classification.csv')
 
@@ -161,7 +217,7 @@ def createNoFaceCSV_regression():
     for image in tqdm(os.listdir(path_in)):
         input_image = os.path.join(path_in, image)
 
-        df = df._append({'path': input_image, 'age': '0', 'gender': 3, 'face': 1}, ignore_index=True)
+        df = df._append({'path': input_image, 'age': '0', 'gender': 2, 'face': 1}, ignore_index=True)
 
     df.to_csv('Data/noFace_regression.csv')
 
@@ -173,12 +229,13 @@ def resizePIL(image_url):
         return im_resized
 
 
-path_in = "/home/sarah/Pictures/StarWars_cropped"
-path_out = "/MS3/prediction/StarWars"
+'''path_in = "/home/sarah/Pictures/test"
+path_out = "/home/sarah/Deep-Learning/MS3/prediction/deutschePromis"
 i = 0
 for image in tqdm(os.listdir(path_in)):
     input_image = os.path.join(path_in, image)
     resizedImage = resizePIL(input_image)
-    resizedImage.save(os.path.join(path_out, image))
+    resizedImage.save(os.path.join(path_out, image))'''
+
 
 

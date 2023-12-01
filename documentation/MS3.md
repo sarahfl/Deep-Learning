@@ -9,7 +9,15 @@ Geschlecht: [0,1], wobei 0 = männlich und 1 = weiblich <br>
 # Aufgabe: Multi-Task-Learning
 ## Option 1: Multi-Task-Learning als Klassifikationsproblem mit diskreten Altersklassen
 
-gender = [0,1,3], wobei 0=männlich, 1=weiblich, 3=kein Geschlecht
+### Daten erstellen:
+MS3_rawData entspacken <br>
+csv Datein mit preprocessing/preprocessing.py
+- createFaceCSV_classification()
+- createnoFaceCSV_classification()
+
+### One-Hot-Encoding
+
+gender = [0,1,2], wobei 0=männlich, 1=weiblich, 3=kein Geschlecht
 
 face = [0,1], wobei 0=Gesicht, 1=kein Gesicht
 
@@ -32,13 +40,38 @@ age4: Erwachsene
 age5: Erste Zeichen des Alterns
 age6: graue Haare, eingefallene Haut
 
+### Classification Model
+multiTaskLearning_classification.py ausführen
 
+### Model auf deutschem Promi-Datenset testen
+Promi-Datenset herunterladen: https://drive.google.com/file/d/1V8r50K1JF_DHNqq4mzetxjoxgnC4eyYm/view?usp=sharing
+Entpacken und csv-Datei erstellen mit preprocessing/preprocessing.py
+- promisToCSV_classification()
+
+predict_classification.py ausführen
 
 ## Option 2: Multi-Task-Learning als Multi-Output-Regression
 
-gender = [0,1,3], wobei 0=männlich, 1=weiblich, 3=kein Geschlecht
+### Daten erstellen:
+MS3_rawData entpacken <br>
+csv Datein erstellen mit preprocessing/preprocessing.py:
+- createFaceCSV_regression()
+- createNoFaceCSV_regression()
+
+### One-Hot-Encoding
+
+gender = [0,1,2], wobei 0=männlich, 1=weiblich, 2=kein Geschlecht
 
 face = [0,1], wobei 0=Gesicht, 1=kein Gesicht
 
-age = [1,116], wobei 0=Alter kann nicht zugeordnet werden
+age = [0..116], wobei 0=Alter kann nicht zugeordnet werden
 
+### Regression Model
+TODO: Regression Model brauen
+
+### Model auf deutschem Promi-Datenset testen
+Promi-Datenset herunterladen: https://drive.google.com/file/d/1V8r50K1JF_DHNqq4mzetxjoxgnC4eyYm/view?usp=sharing
+Entpacken und csv-Datei erstellen mit preprocessing/preprocessing.py
+- promisToCSV_regression()
+
+TODO: predict_regression.py erstellen und predictions ausgeben lassen
