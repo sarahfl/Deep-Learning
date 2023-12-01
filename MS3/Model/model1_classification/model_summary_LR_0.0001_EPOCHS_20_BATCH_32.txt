@@ -18,10 +18,10 @@ ________________________________________________________________________________
  global_average_pooling2d (  (None, 1280)                 0         ['mobilenetv2_1.00_224[0][0]']
  GlobalAveragePooling2D)                                                                          
                                                                                                   
- dense (Dense)               (None, 1280)                 1639680   ['global_average_pooling2d[0][
+ dense (Dense)               (None, 1280, relu)                 1639680   ['global_average_pooling2d[0][
                                                                     0]']                          
                                                                                                   
- dropout (Dropout)           (None, 1280)                 0         ['dense[0][0]']               
+ dropout (Dropout)           (None, 1280, 0.5)                 0         ['dense[0][0]']
                                                                                                   
  age_output (Dense)          (None, 8)                    10248     ['dropout[0][0]']             
                                                                                                   
