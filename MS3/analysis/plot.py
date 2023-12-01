@@ -55,5 +55,5 @@ def plotHistory(path_to_model):
     plt.savefig('loss.png')
     plt.show()
 
-path_to_model = '/home/sarah/Deep-Learning/MS3/Model/model1'
+path_to_model = '/MS3/Model/model1_classification'
 plotHistory(path_to_model)

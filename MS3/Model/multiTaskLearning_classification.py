@@ -5,7 +5,7 @@ import tensorflow as tf
 import os
 import numpy as np
 
-modelType = 'model1'
+modelType = 'model1_classification'
 
 
 def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
