@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
+modelType = 'model1_classification'
 def plotHistory(path_to_model):
     # Lade die Daten aus den CSV-Dateien
     age_history = pd.read_csv(os.path.join(path_to_model, 'history_age.csv'))
@@ -26,9 +27,9 @@ def plotHistory(path_to_model):
     plt.title('Accuracy Age, Gender, Face')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
-    plt.legend(loc='upper right')  # Legende oben rechts
+    plt.legend(loc='lower right')  # Legende oben rechts
     plt.grid(True)
-    plt.savefig('accuracy.png')
+    plt.savefig('/home/sarah/Deep-Learning/MS3/Model/{}/accuracy.png'.format(modelType))
     plt.show()
 
     ## Plot Loss
@@ -49,11 +50,11 @@ def plotHistory(path_to_model):
     plt.title('Loss Age, Gender, Face')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.legend(loc='upper right')  # Legende oben rechts
+    plt.legend(loc='upper right')
     plt.grid(True)
 
-    plt.savefig('loss.png')
+    plt.savefig('/home/sarah/Deep-Learning/MS3/Model/{}/loss.png'.format(modelType))
     plt.show()
 
-path_to_model = '/MS3/Model/model1_classification'
+path_to_model = '/home/sarah/Deep-Learning/MS3/Model/{}'.format(modelType)
 plotHistory(path_to_model)
