@@ -62,7 +62,53 @@ predicted_age_labels = np.argmax(predictions_age, axis=1)
 predicted_gender_labels = np.argmax(predictions_gender, axis=1)
 predicted_face_labels = np.argmax(predictions_face, axis=1)
 
+# revert age classification
+age_array = []
+for age in predicted_age_labels:
+    age_range = ''
+    if age == 0:
+        age_range = '[1..2]'
+    elif age == 1:
+        age_range = '[3..9]'
+    elif age == 2:
+        age_range = '[10..20]'
+    elif age == 3:
+        age_range = '[21..27'
+    elif age == 4:
+        age_range = '[28..45]'
+    elif age == 5:
+        age_range = '[46..65]'
+    elif age == 6:
+        age_range = '[66..116]'
+    elif age == 7:
+        age_range = 'no age'
+
+    age_array.append(age_range)
+
+# revert face classification
+face_array = []
+for face in predicted_face_labels:
+    fa = ''
+    if face == 0 :
+        fa = 'yes'
+    else:
+        fa='no'
+    face_array.append(fa)
+
+# revert gender classification
+gender_array = []
+for gender in predicted_gender_labels:
+    ge = ''
+    if gender == 0:
+        ge = 'm'
+    elif gender == 1:
+        ge = 'f'
+    else:
+        ge = 'no'
+    gender_array.append(ge)
+
 fig, axs = plt.subplots(3, 3, figsize=(10, 10))
+plt.subplots_adjust(top=0.92, bottom=0.08, left=0.10, right=0.95, hspace=0.4, wspace=0.35)
 for i in range(3):
     for j in range(3):
         index = i * 3 + j
@@ -72,7 +118,7 @@ for i in range(3):
         axs[i, j].axis('off')
 
         # title
-        title = f"Age: {predicted_age_labels[index]}, Gender: {predicted_gender_labels[index]}, Face: {predicted_face_labels[index]}"
+        title = f"Age: {age_array[index]}, Gender: {gender_array[index]}, Face: {face_array[index]}"
         axs[i, j].set_title(title)
 plt.savefig('/home/sarah/Deep-Learning/MS3/Model/{}/promis_classification.png'.format(modelType))
 plt.show()
