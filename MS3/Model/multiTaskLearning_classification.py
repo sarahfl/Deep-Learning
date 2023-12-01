@@ -2,8 +2,9 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
-import os
 import numpy as np
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
 
 modelType = 'model1_classification'
 
@@ -70,9 +71,9 @@ train_dataset = dataset.take(train_size)
 val_dataset = dataset.skip(train_size).take(val_size)
 test_dataset = dataset.skip(train_size + val_size)
 
-train_dataset = train_dataset.batch(BATCH_SIZE, drop_remainder=True)
-val_dataset = val_dataset.batch(BATCH_SIZE, drop_remainder=True)
-test_dataset = test_dataset.batch(BATCH_SIZE, drop_remainder=True)
+train_dataset = train_dataset.batch(BATCH_SIZE)
+val_dataset = val_dataset.batch(BATCH_SIZE)
+test_dataset = test_dataset.batch(BATCH_SIZE)
 
 ##
 AUTOTUNE = tf.data.AUTOTUNE
@@ -245,3 +246,102 @@ csv_file_test = '{}/test_metrics.csv'.format(modelType)
 csv_file_val = '{}/validation_metrics.csv'.format(modelType)
 df_test.to_csv(csv_file_test, index=False)
 df_val.to_csv(csv_file_val, index=False)
+
+##
+# -- CONFUSION MATRIX --------------------------------------------------------------------------------------------------
+# predict test data
+predictions = model.predict(test_dataset)
+predicted_age = np.argmax(predictions[0], axis=1)
+predicted_gender = np.argmax(predictions[1], axis=1)
+predicted_face = np.argmax(predictions[2], axis=1)
+
+# true labels
+true_labels_age = np.argmax(np.concatenate([label['age_output'] for _, label in test_dataset], axis=0), axis=1)
+true_labels_gender = np.argmax(np.concatenate([label['gender_output'] for _, label in test_dataset], axis=0), axis=1)
+true_labels_face = np.argmax(np.concatenate([label['face_output'] for _, label in test_dataset], axis=0), axis=1)
+
+# confusion matrices
+cm_age = confusion_matrix(true_labels_age, predicted_age)
+cm_gender = confusion_matrix(true_labels_gender, predicted_gender)
+cm_face = confusion_matrix(true_labels_face, predicted_face)
+
+# define class labels
+class_labels_age = ['age0', 'age1', 'age2', 'age3', 'age4', 'age5', 'age6', 'age7']
+class_labels_gender = ['male', 'female', 'no gender']
+class_labels_face = ['face', 'no face']
+
+# plot
+plt.figure(figsize=(15, 5))
+
+plt.subplot(1, 3, 1)
+sns.heatmap(cm_age, annot=True, fmt='d', cmap='Blues', xticklabels=class_labels_age, yticklabels=class_labels_age)
+plt.xlabel('Predicted Class')
+plt.ylabel('True Class')
+plt.title('Confusion Matrix - Age')
+
+plt.subplot(1, 3, 2)
+sns.heatmap(cm_gender, annot=True, fmt='d', cmap='Blues', xticklabels=class_labels_gender,
+            yticklabels=class_labels_gender)
+plt.xlabel('Predicted Class')
+plt.ylabel('True Class')
+plt.title('Confusion Matrix - Gender')
+
+plt.subplot(1, 3, 3)
+sns.heatmap(cm_face, annot=True, fmt='d', cmap='Blues', xticklabels=class_labels_face, yticklabels=class_labels_face)
+plt.xlabel('Predicted Class')
+plt.ylabel('True Class')
+plt.title('Confusion Matrix - Face')
+
+plt.tight_layout()
+plt.savefig('/home/sarah/Deep-Learning/MS3/Model/{}/confusion_matrix.png'.format(modelType))
+plt.show()
+
+##
+# -- FIND FALSE PREDICTED IMAGES IN TEST SET ---------------------------------------------------------------------------
+# find index of the false predicted image
+incorrect_predictions_face = np.where(predicted_face != true_labels_face)[0]
+incorrect_predictions_age = np.where(predicted_age != true_labels_age)[0]
+incorrect_predictions_gender = np.where(predicted_gender != true_labels_gender)[0]
+
+# extract path for each image
+incorrect_image_paths_face = train_df['path'].iloc[test_size + val_size + incorrect_predictions_face].tolist()
+incorrect_image_paths_age = train_df['path'].iloc[test_size + val_size + incorrect_predictions_age].tolist()
+incorrect_image_paths_gender = train_df['path'].iloc[test_size + val_size + incorrect_predictions_gender].tolist()
+
+# extract false predicted labels and true labels
+predicted_labels_face = predicted_face[incorrect_predictions_face]
+true_labels_face = true_labels_face[incorrect_predictions_face]
+
+predicted_labels_age = predicted_age[incorrect_predictions_age]
+true_labels_age = true_labels_age[incorrect_predictions_age]
+
+predicted_labels_gender = predicted_gender[incorrect_predictions_gender]
+true_labels_gender = true_labels_gender[incorrect_predictions_gender]
+
+# make dataframes
+df_incorrect_paths_face = pd.DataFrame({'Image_Path': incorrect_image_paths_face,
+                                        'Predicted_Face': predicted_labels_face,
+                                        'True_Face': true_labels_face})
+
+df_incorrect_paths_age = pd.DataFrame({'Image_Path': incorrect_image_paths_age,
+                                       'Predicted_Age': predicted_labels_age,
+                                       'True_Age': true_labels_age})
+
+df_incorrect_paths_gender = pd.DataFrame({'Image_Path': incorrect_image_paths_gender,
+                                          'Predicted_Gender': predicted_labels_gender,
+                                          'True_Gender': true_labels_gender})
+
+
+print('---------------------------------------------------------------------------------------------------------------')
+# save to csv
+csv_file_face = '/home/sarah/Deep-Learning/MS3/Model/{}/incorrect_predictions_face.csv'.format(modelType)
+df_incorrect_paths_face.to_csv(csv_file_face, index=False)
+print(f"Falsch vorhergesagte Bildpfade für Face wurden in '{csv_file_face}' gespeichert.")
+
+csv_file_age = '/home/sarah/Deep-Learning/MS3/Model/{}/incorrect_predictions_age.csv'.format(modelType)
+df_incorrect_paths_age.to_csv(csv_file_age, index=False)
+print(f"Falsch vorhergesagte Bildpfade für Age wurden in '{csv_file_age}' gespeichert.")
+
+csv_file_gender = '/home/sarah/Deep-Learning/MS3/Model/{}/incorrect_predictions_gender.csv'.format(modelType)
+df_incorrect_paths_gender.to_csv(csv_file_gender, index=False)
+print(f"Falsch vorhergesagte Bildpfade für Gender wurden in '{csv_file_gender}' gespeichert.")
