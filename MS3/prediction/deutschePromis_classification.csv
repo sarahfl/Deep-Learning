@@ -1,0 +1,11 @@
+,path,age,gender,face
+0,/home/sarah/Deep-Learning/MS3/prediction/deutschePromis/63_0_lesch.jpg,age5,0,0
+1,/home/sarah/Deep-Learning/MS3/prediction/deutschePromis/34_1_mai.jpg,age4,1,0
+2,/home/sarah/Deep-Learning/MS3/prediction/deutschePromis/0_2_elmo.jpg,age7,2,1
+3,/home/sarah/Deep-Learning/MS3/prediction/deutschePromis/11_1_nina.jpg,age2,1,0
+4,/home/sarah/Deep-Learning/MS3/prediction/deutschePromis/69_1_merkel.jpg,age6,1,0
+5,/home/sarah/Deep-Learning/MS3/prediction/deutschePromis/87_0_papst.jpg,age6,0,0
+6,/home/sarah/Deep-Learning/MS3/prediction/deutschePromis/47_0_schulz_1.jpg,age5,0,0
+7,/home/sarah/Deep-Learning/MS3/prediction/deutschePromis/42_0_boehmermann.jpg,age4,0,0
+8,/home/sarah/Deep-Learning/MS3/prediction/deutschePromis/30_1_brugger.jpg,age4,1,0
+9,/home/sarah/Deep-Learning/MS3/prediction/deutschePromis/30_0_rezo.jpg,age4,0,0
