@@ -17,7 +17,7 @@ csv Datein mit preprocessing/preprocessing.py
 
 ### One-Hot-Encoding
 
-gender = [0,1,2], wobei 0=männlich, 1=weiblich, 3=kein Geschlecht
+gender = [0,1,2], wobei 0=männlich, 1=weiblich, 2=kein Geschlecht
 
 face = [0,1], wobei 0=Gesicht, 1=kein Gesicht
 
