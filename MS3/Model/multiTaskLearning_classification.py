@@ -5,8 +5,9 @@ import tensorflow as tf
 import numpy as np
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
+import keras
 
-modelType = 'model1_classification'
+modelType = 'model11_classification'
 
 
 def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
@@ -26,7 +27,7 @@ def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
 ##
 BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
-EPOCHS = 20
+EPOCHS = 50
 IMG_SHAPE = IMG_SIZE + (3,)
 
 ##
@@ -94,7 +95,12 @@ base_model = tf.keras.applications.MobileNetV2(weights='imagenet', include_top=F
 base_model.summary()
 print('Anzahl der trainierbaren Variablen: ', len(base_model.trainable_variables))
 
-base_model.trainable = False
+# -- FINE TUNING -------------------------------------------------------------------------------------------------------
+print("Number of layers in the base model: ", len(base_model.layers))
+fine_tune_at = 130
+# Freeze all the layers before the `fine_tune_at` layer
+for layer in base_model.layers[:fine_tune_at]:
+    layer.trainable = False
 
 ##
 # -- CUSTOM TOP LAYER --------------------------------------------------------------------------------------------------
@@ -103,13 +109,19 @@ preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
 inputs = tf.keras.Input(shape=(200, 200, 3))
 x = data_augmentation(inputs)
 x = preprocess_input(x)
-x = base_model(x, training=False)
+x = base_model(x)
 x = tf.keras.layers.GlobalAveragePooling2D()(x)
 x = tf.keras.layers.Dense(1280, activation='relu')(x)
 x = tf.keras.layers.Dropout(0.5)(x)
 
+x_age = tf.keras.layers.Dense(640, activation='relu')(x)
+x_age = tf.keras.layers.Dense(320, activation='relu')(x_age)
+x_age = tf.keras.layers.Dense(160, activation='relu')(x_age)
+x_age = tf.keras.layers.Dense(80, activation='relu')(x_age)
+x_age = tf.keras.layers.Dropout(0.5)(x_age)
+
 # OUTPUT AGE
-output_age = tf.keras.layers.Dense(8, activation='softmax', name='age_output')(x)
+output_age = tf.keras.layers.Dense(8, activation='softmax', name='age_output')(x_age)
 
 # OUTPUT GENDER
 output_gender = tf.keras.layers.Dense(3, activation='softmax', name='gender_output')(x)
@@ -122,6 +134,7 @@ model = tf.keras.Model(inputs, [output_age, output_gender, output_face])
 
 ##
 # -- COMPILE THE MODEL -------------------------------------------------------------------------------------------------
+
 base_learning_rate = 0.0001
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
               loss={'age_output': tf.keras.losses.CategoricalCrossentropy(),
@@ -129,7 +142,9 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rat
                     'face_output': tf.keras.losses.BinaryCrossentropy()},
               metrics={'age_output': 'accuracy',
                        'gender_output': 'accuracy',
-                       'face_output': 'accuracy'})
+                       'face_output': 'accuracy'},
+              loss_weights=[2, 1, 1]
+              )
 
 model.summary()
 print('Anzahl der trainierbaren Variablen: ', len(model.trainable_variables))
@@ -141,13 +156,16 @@ with open('{}/model_summary_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(modelType, base
 
 ##
 # -- TRAIN THE MODEL ---------------------------------------------------------------------------------------------------
-# Early Stopping Callback
-# early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+#Early Stopping Callback
+early_stopping_age = keras.callbacks.EarlyStopping(monitor='val_age_output_accuracy', patience=5, restore_best_weights=True)
+# early_stopping_gender = keras.callbacks.EarlyStopping(monitor='val_gender_output_accuracy', patience=5, restore_best_weights=True)
+# early_stopping_face = keras.callbacks.EarlyStopping(monitor='val_face_output_accuracy', patience=5, restore_best_weights=True)
 
 history = model.fit(train_dataset,
                     epochs=EPOCHS,
                     batch_size=BATCH_SIZE,
-                    validation_data=validation_dataset)
+                    validation_data=validation_dataset,
+                    callbacks=[early_stopping_age])
 
 ##
 # -- SAVE HISTORY AND MODEL --------------------------------------------------------------------------------------------
@@ -330,7 +348,6 @@ df_incorrect_paths_age = pd.DataFrame({'Image_Path': incorrect_image_paths_age,
 df_incorrect_paths_gender = pd.DataFrame({'Image_Path': incorrect_image_paths_gender,
                                           'Predicted_Gender': predicted_labels_gender,
                                           'True_Gender': true_labels_gender})
-
 
 print('---------------------------------------------------------------------------------------------------------------')
 # save to csv
