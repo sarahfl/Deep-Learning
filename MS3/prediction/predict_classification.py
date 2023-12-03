@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-modelType = 'model11_classification'
+modelType = 'model12_classification'
 BATCH_SIZE = 32
 
 def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
