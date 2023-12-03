@@ -378,9 +378,8 @@ def accuracy_loss_combination():
     plt.xlabel('Loss')
     plt.ylabel('Accuracy')
 
-    # Jeden Punkt beschriften
     for i, label in enumerate(parameter_labels):
-        plt.annotate(label, (losses[i], accuracies[i]))
+        plt.annotate(label, (losses[i], accuracies[i]), textcoords="offset points", xytext=(0, 10), ha='center')
 
     # Plot anzeigen
     plt.legend()
