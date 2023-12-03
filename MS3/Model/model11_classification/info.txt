@@ -1,0 +1,2 @@
+layer ab 130 ausgeschaltet
+ loss_weights=[2,1,1]

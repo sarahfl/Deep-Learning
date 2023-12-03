@@ -1,0 +1,44 @@
+Model: "model"
+__________________________________________________________________________________________________
+ Layer (type)                Output Shape                 Param #   Connected to                  
+==================================================================================================
+ input_2 (InputLayer)        [(None, 200, 200, 3)]        0         []                            
+                                                                                                  
+ sequential (Sequential)     (None, 200, 200, 3)          0         ['input_2[0][0]']             
+                                                                                                  
+ tf.math.truediv (TFOpLambd  (None, 200, 200, 3)          0         ['sequential[0][0]']          
+ a)                                                                                               
+                                                                                                  
+ tf.math.subtract (TFOpLamb  (None, 200, 200, 3)          0         ['tf.math.truediv[0][0]']     
+ da)                                                                                              
+                                                                                                  
+ mobilenetv2_1.00_224 (Func  (None, 7, 7, 1280)           2257984   ['tf.math.subtract[0][0]']    
+ tional)                                                                                          
+                                                                                                  
+ global_average_pooling2d (  (None, 1280)                 0         ['mobilenetv2_1.00_224[0][0]']
+ GlobalAveragePooling2D)                                                                          
+                                                                                                  
+ dense (Dense)               (None, 1280)                 1639680   ['global_average_pooling2d[0][
+                                                                    0]']                          
+                                                                                                  
+ dropout (Dropout)           (None, 1280,0.5)                 0         ['dense[0][0]']
+                                                                                                  
+ dense_1 (Dense)             (None, 1024, relu)                 1311744   ['dropout[0][0]']
+                                                                                                  
+ dropout_1 (Dropout)         (None, 1024, 0.3)                 0         ['dense_1[0][0]']
+                                                                                                  
+ dense_2 (Dense)             (None, 512,relu)                  524800    ['dropout_1[0][0]']
+                                                                                                  
+ dropout_2 (Dropout)         (None, 512, 0.2)                  0         ['dense_2[0][0]']
+                                                                                                  
+ age_output (Dense)          (None, 8)                    4104      ['dropout_2[0][0]']           
+                                                                                                  
+ gender_output (Dense)       (None, 3)                    3843      ['dropout[0][0]']             
+                                                                                                  
+ face_output (Dense)         (None, 2)                    2562      ['dropout[0][0]']             
+                                                                                                  
+==================================================================================================
+Total params: 5744717 (21.91 MB)
+Trainable params: 3486733 (13.30 MB)
+Non-trainable params: 2257984 (8.61 MB)
+__________________________________________________________________________________________________

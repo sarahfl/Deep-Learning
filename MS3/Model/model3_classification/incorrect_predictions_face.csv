@@ -1,0 +1,3 @@
+Image_Path,Predicted_Face,True_Face
+/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/UTKFace/40_1_face_23570.jpg,0,1
+/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/UTKFace/44_0_face_7308.jpg,1,0

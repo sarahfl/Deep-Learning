@@ -1,0 +1,4 @@
+Image_Path,Predicted_Face,True_Face
+/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/noFace/animals10_sheep_480.jpg,0,1
+/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/UTKFace/16_0_face_9601.jpg,1,0
+/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/UTKFace/38_0_face_16778.jpg,1,0

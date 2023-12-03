@@ -1,0 +1,46 @@
+Model: "model"
+__________________________________________________________________________________________________
+ Layer (type)                Output Shape                 Param #   Connected to                  
+==================================================================================================
+ input_2 (InputLayer)        [(None, 200, 200, 3)]        0         []                            
+                                                                                                  
+ sequential (Sequential)     (None, 200, 200, 3)          0         ['input_2[0][0]']             
+                                                                                                  
+ tf.math.truediv (TFOpLambd  (None, 200, 200, 3)          0         ['sequential[0][0]']          
+ a)                                                                                               
+                                                                                                  
+ tf.math.subtract (TFOpLamb  (None, 200, 200, 3)          0         ['tf.math.truediv[0][0]']     
+ da)                                                                                              
+                                                                                                  
+ mobilenetv2_1.00_224 (Func  (None, 7, 7, 1280)           2257984   ['tf.math.subtract[0][0]']    
+ tional)                                                                                          
+                                                                                                  
+ global_average_pooling2d (  (None, 1280)                 0         ['mobilenetv2_1.00_224[0][0]']
+ GlobalAveragePooling2D)                                                                          
+                                                                                                  
+ dense (Dense)               (None, 1280)                 1639680   ['global_average_pooling2d[0][
+                                                                    0]']                          
+                                                                                                  
+ dropout (Dropout)           (None, 1280)                 0         ['dense[0][0]']               
+                                                                                                  
+ dense_1 (Dense)             (None, 640)                  819840    ['dropout[0][0]']             
+                                                                                                  
+ dense_2 (Dense)             (None, 320)                  205120    ['dense_1[0][0]']             
+                                                                                                  
+ dense_3 (Dense)             (None, 160)                  51360     ['dense_2[0][0]']             
+                                                                                                  
+ dense_4 (Dense)             (None, 80)                   12880     ['dense_3[0][0]']             
+                                                                                                  
+ dropout_1 (Dropout)         (None, 80)                   0         ['dense_4[0][0]']             
+                                                                                                  
+ age_output (Dense)          (None, 8)                    648       ['dropout_1[0][0]']           
+                                                                                                  
+ gender_output (Dense)       (None, 3)                    3843      ['dropout[0][0]']             
+                                                                                                  
+ face_output (Dense)         (None, 2)                    2562      ['dropout[0][0]']             
+                                                                                                  
+==================================================================================================
+Total params: 4993917 (19.05 MB)
+Trainable params: 4597373 (17.54 MB)
+Non-trainable params: 396544 (1.51 MB)
+__________________________________________________________________________________________________
