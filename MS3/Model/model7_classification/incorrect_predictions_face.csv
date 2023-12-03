@@ -1,0 +1,3 @@
+Image_Path,Predicted_Face,True_Face
+/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/noFace/animals10_dog_4343.jpg,0,1
+/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/UTKFace/25_0_face_1712.jpg,1,0
