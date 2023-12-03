@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import keras
 
-modelType = 'model11_classification'
+modelType = 'model12_classification'
 
 
 def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
@@ -34,6 +34,10 @@ IMG_SHAPE = IMG_SIZE + (3,)
 # -- GET DATA ----------------------------------------------------------------------------------------------------------
 df_face = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/Data/Face_classification.csv', index_col=0)
 df_noFace = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/Data/noFace_classification.csv', index_col=0)
+# delta = len(df_noFace) - 12500
+# drop_indices = np.random.choice(df_noFace.index, delta, replace=False)
+# df_subset_noFace = df_noFace.drop(drop_indices)
+
 df = pd.concat([df_face, df_noFace], axis=0, ignore_index=True)
 
 # shuffle dataframe
@@ -142,8 +146,7 @@ model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rat
                     'face_output': tf.keras.losses.BinaryCrossentropy()},
               metrics={'age_output': 'accuracy',
                        'gender_output': 'accuracy',
-                       'face_output': 'accuracy'},
-              loss_weights=[2, 1, 1]
+                       'face_output': 'accuracy'}
               )
 
 model.summary()

@@ -173,7 +173,7 @@ def plotBoxplot():
     plt.show()
 
 
-modelType = 'model10_classification'
+modelType = 'model12_classification'
 path_to_model = '/home/sarah/Deep-Learning/MS3/Model/{}'.format(modelType)
 plotHistory(path_to_model)
 
