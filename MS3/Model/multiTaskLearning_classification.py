@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 import keras
 
-modelType = 'model12_classification'
+modelType = 'test'
 
 
 def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
@@ -270,6 +270,7 @@ df_val.to_csv(csv_file_val, index=False)
 
 ##
 # -- CONFUSION MATRIX --------------------------------------------------------------------------------------------------
+#model = keras.models.load_model('/home/sarah/Deep-Learning/MS3/Model/model10_classification/model.keras')
 # predict test data
 predictions = model.predict(test_dataset)
 predicted_age = np.argmax(predictions[0], axis=1)
@@ -325,19 +326,20 @@ incorrect_predictions_age = np.where(predicted_age != true_labels_age)[0]
 incorrect_predictions_gender = np.where(predicted_gender != true_labels_gender)[0]
 
 # extract path for each image
-incorrect_image_paths_face = train_df['path'].iloc[test_size + val_size + incorrect_predictions_face].tolist()
-incorrect_image_paths_age = train_df['path'].iloc[test_size + val_size + incorrect_predictions_age].tolist()
-incorrect_image_paths_gender = train_df['path'].iloc[test_size + val_size + incorrect_predictions_gender].tolist()
+incorrect_image_paths_face = train_df['path'].iloc[incorrect_predictions_face].tolist()
+incorrect_image_paths_age = train_df['path'].iloc[incorrect_predictions_age].tolist()
+incorrect_image_paths_gender = train_df['path'].iloc[incorrect_predictions_gender].tolist()
 
 # extract false predicted labels and true labels
 predicted_labels_face = predicted_face[incorrect_predictions_face]
-true_labels_face = true_labels_face[incorrect_predictions_face]
+true_labels_face = train_df['face'].iloc[incorrect_predictions_face].tolist()
 
 predicted_labels_age = predicted_age[incorrect_predictions_age]
-true_labels_age = true_labels_age[incorrect_predictions_age]
+true_labels_age = train_df['age'].iloc[incorrect_predictions_age].tolist()
 
 predicted_labels_gender = predicted_gender[incorrect_predictions_gender]
-true_labels_gender = true_labels_gender[incorrect_predictions_gender]
+true_labels_gender = train_df['gender'].iloc[incorrect_predictions_gender].tolist()
+
 
 # make dataframes
 df_incorrect_paths_face = pd.DataFrame({'Image_Path': incorrect_image_paths_face,
