@@ -371,9 +371,9 @@ plt.figure(figsize=(8, 6))
 plt.scatter(true_labels_age_nz, predicted_age_nz, alpha=0.3)
 plt.plot(true_labels_age_nz, true_labels_age_nz, color='red', linestyle='-', label='Ideal')
 plt.plot(true_labels_age_nz, upper_bound_original, color='green', linestyle='--',
-         label=f'MAE +{mae:.2f}')
+         label=f'MAE +{mae/2:.2f}')
 plt.plot(true_labels_age_nz, lower_bound_original, color='green', linestyle='--',
-         label=f'MAE -{mae:.2f}')
+         label=f'MAE -{mae/2:.2f}')
 plt.xlabel('True Age')
 plt.ylabel('Predicted Age')
 plt.title('Predicted vs. True Age')
