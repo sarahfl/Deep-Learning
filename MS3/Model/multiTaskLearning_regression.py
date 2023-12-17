@@ -148,7 +148,7 @@ class CustomMSE(tf.keras.losses.Loss):
 
     def call(self, y_true, y_pred):
         loss = tf.where(tf.math.not_equal(y_true, 0),
-                        tf.reduce_mean(tf.square(y_true - y_pred)),
+                        tf.reduce_mean(tf.square(tf.cast(y_true, tf.float32) - y_pred)),
                         0.0)  # Set loss to 0 where y_true is 0
         return loss
 
@@ -162,14 +162,15 @@ class CustomMSE(tf.keras.losses.Loss):
 def custom_mse(y_true, y_pred):
     # Calculate the mean squared error only where y_true is non-zero
     loss = tf.where(tf.math.not_equal(y_true, 0),
-                    tf.reduce_mean(tf.square(y_true - y_pred)),
+                    # cast one to float or the other to int
+                    tf.reduce_mean(tf.square(tf.cast(y_true, tf.float32) - y_pred)),
                     0.0)  # Set loss to 0 where y_true is 0
     return loss
 
 
 base_learning_rate = 0.0001
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=base_learning_rate),
-              loss={'age_output': custom_mse,
+              loss={'age_output': CustomMSE(),
                     'gender_output': tf.keras.losses.CategoricalCrossentropy(),
                     'face_output': tf.keras.losses.BinaryCrossentropy()},
               metrics={'age_output': 'mae',
@@ -202,8 +203,11 @@ history = model.fit(train_dataset.take(data_amount),
                     callbacks=[early_stopping_age])
 ##
 age_loss = history.history['age_output_loss']
+age_loss_val = history.history['val_age_output_loss']
 gender_loss = history.history['gender_output_loss']
+gender_loss_val = history.history['val_gender_output_loss']
 face_loss = history.history['face_output_loss']
+face_loss_val = history.history['val_face_output_loss']
 
 epochs = range(1, len(age_loss) + 1)
 
@@ -212,6 +216,7 @@ plt.figure(figsize=(10, 5))
 
 plt.subplot(1, 3, 1)
 plt.plot(epochs, age_loss, label='Age Loss')
+plt.plot(epochs, age_loss_val, label='Age Loss Val')
 plt.title('Age Loss')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
@@ -219,6 +224,7 @@ plt.legend()
 
 plt.subplot(1, 3, 2)
 plt.plot(epochs, gender_loss, label='Gender Loss')
+plt.plot(epochs, gender_loss_val, label='Gender Loss Val')
 plt.title('Gender Loss')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
@@ -226,6 +232,7 @@ plt.legend()
 
 plt.subplot(1, 3, 3)
 plt.plot(epochs, face_loss, label='Face Loss')
+plt.plot(epochs, face_loss_val, label='Face Loss_val')
 plt.title('Face Loss')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
@@ -333,8 +340,8 @@ df_val.to_csv(csv_file_val, index=False)
 
 ##
 # predict test data
-tf.keras.utils.get_custom_objects()['CustomMSE'] = CustomMSE
-model = tf.keras.models.load_model('MS3/Model/{}/model.keras'.format(modelType))
+#tf.keras.utils.get_custom_objects()['CustomMSE'] = CustomMSE
+#model = tf.keras.models.load_model('MS3/Model/{}/model.keras'.format(modelType))
 
 predictions = model.predict(test_dataset)
 ##
