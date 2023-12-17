@@ -2,9 +2,9 @@ Model: "model"
 __________________________________________________________________________________________________
  Layer (type)                Output Shape                 Param #   Connected to                  
 ==================================================================================================
- input_3 (InputLayer)        [(None, 200, 200, 3)]        0         []                            
+ input_2 (InputLayer)        [(None, 200, 200, 3)]        0         []                            
                                                                                                   
- sequential (Sequential)     (None, 200, 200, 3)          0         ['input_3[0][0]']             
+ sequential (Sequential)     (None, 200, 200, 3)          0         ['input_2[0][0]']             
                                                                                                   
  tf.math.truediv (TFOpLambd  (None, 200, 200, 3)          0         ['sequential[0][0]']          
  a)                                                                                               

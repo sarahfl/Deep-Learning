@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import tensorflow as tf
 import numpy as np
-import seaborn as sns
 import keras
 import os
 from sklearn.metrics import mean_absolute_error
 
-modelType = 'model1_regression'
+print(os.path.dirname(__file__))
+modelType = 'model2_regression'
 
 if not os.path.exists(f"MS3/Model/{modelType}"):
     os.mkdir(f"MS3/Model/{modelType}")
@@ -50,9 +50,6 @@ train_df = df.sample(frac=1)
 ##
 # -- ONE HOT ENCODING --------------------------------------------------------------------------------------------------
 age_labels = train_df['age'].values.astype(int)
-#age_mean = age_labels.mean()
-#age_std = age_labels.std()
-#age_labels = (age_labels - age_mean) / age_std  # Normalize using mean and standard deviation
 one_hot_gender = pd.get_dummies(train_df['gender']).astype(int)
 one_hot_face = pd.get_dummies(train_df['face']).astype(int)
 
@@ -144,6 +141,22 @@ model = tf.keras.Model(inputs, [output_age, output_gender, output_face])
 
 
 ##
+@tf.keras.utils.register_keras_serializable(package='Custom', name='custom_mse')
+class CustomMSE(tf.keras.losses.Loss):
+    def __init__(self, name='custom_mse'):
+        super().__init__(name=name)
+
+    def call(self, y_true, y_pred):
+        loss = tf.where(tf.math.not_equal(y_true, 0),
+                        tf.reduce_mean(tf.square(y_true - y_pred)),
+                        0.0)  # Set loss to 0 where y_true is 0
+        return loss
+
+    def get_config(self):
+        return {'name': self.name}
+
+
+##
 # -- COMPILE THE MODEL -------------------------------------------------------------------------------------------------
 
 def custom_mse(y_true, y_pred):
@@ -187,7 +200,39 @@ history = model.fit(train_dataset.take(data_amount),
                     batch_size=BATCH_SIZE,
                     validation_data=validation_dataset.take(data_amount),
                     callbacks=[early_stopping_age])
+##
+age_loss = history.history['age_output_loss']
+gender_loss = history.history['gender_output_loss']
+face_loss = history.history['face_output_loss']
 
+epochs = range(1, len(age_loss) + 1)
+
+# Plotting each loss separately
+plt.figure(figsize=(10, 5))
+
+plt.subplot(1, 3, 1)
+plt.plot(epochs, age_loss, label='Age Loss')
+plt.title('Age Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.subplot(1, 3, 2)
+plt.plot(epochs, gender_loss, label='Gender Loss')
+plt.title('Gender Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.subplot(1, 3, 3)
+plt.plot(epochs, face_loss, label='Face Loss')
+plt.title('Face Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.tight_layout()
+plt.show()
 ##
 # -- SAVE HISTORY AND MODEL --------------------------------------------------------------------------------------------
 # save Training-History for each output channel
@@ -287,42 +332,74 @@ df_test.to_csv(csv_file_test, index=False)
 df_val.to_csv(csv_file_val, index=False)
 
 ##
-# -- CONFUSION MATRIX --------------------------------------------------------------------------------------------------
 # predict test data
+tf.keras.utils.get_custom_objects()['CustomMSE'] = CustomMSE
+model = tf.keras.models.load_model('MS3/Model/{}/model.keras'.format(modelType))
+
 predictions = model.predict(test_dataset)
 ##
 # Extracting predicted ages from the predictions
-predicted_age = predictions[0]  # Assuming the age predictions are the first output
-print(predicted_age)
+
+predicted_age = predictions[0].flatten()
+# predicted_face = predictions[1]
+# predicted_gender = predictions[2]
 
 
 # Extracting true labels from the test dataset
 true_labels_age = np.concatenate([label['age_output'] for _, label in test_dataset], axis=0)
-print(true_labels_age)
+##
+# true_labels_gender = np.argmax(np.concatenate([label['gender_output'] for _, label in test_dataset], axis=0), axis=1)
+# true_labels_face = np.argmax(np.concatenate([label['face_output'] for _, label in test_dataset], axis=0), axis=1)
+
+remove_zeros = np.where(true_labels_age == 0)[0]
+
+predicted_age = np.round(predicted_age).astype(int)
+# true_labels_age_original = np.round(true_labels_age).astype(int)
+
+predicted_age_nz = np.delete(predicted_age, remove_zeros, axis=0)
+true_labels_age_nz = np.delete(true_labels_age, remove_zeros, axis=0)
+
 # Calculate MAE
-mae = mean_absolute_error(true_labels_age, predicted_age)
+mae = mean_absolute_error(true_labels_age_nz, predicted_age_nz)
 
 # Calculate upper and lower boundaries for MAE
-upper_bound = true_labels_age + mae
-lower_bound = true_labels_age - mae
-
+upper_bound_original = true_labels_age_nz + mae
+lower_bound_original = true_labels_age_nz - mae
+##
 # Plotting predicted vs. true ages with MAE and ideal line
 plt.figure(figsize=(8, 6))
-plt.scatter(true_labels_age, predicted_age, alpha=0.5)
-plt.plot(true_labels_age, true_labels_age, color='red', linestyle='-', label='Ideal')
-plt.plot(true_labels_age, upper_bound, color='green', linestyle='--', label=f'+{mae:.2f}')
-plt.plot(true_labels_age, lower_bound, color='green', linestyle='--', label=f'-{mae:.2f}')
+plt.scatter(true_labels_age_nz, predicted_age_nz, alpha=0.3)
+plt.plot(true_labels_age_nz, true_labels_age_nz, color='red', linestyle='-', label='Ideal')
+plt.plot(true_labels_age_nz, upper_bound_original, color='green', linestyle='--',
+         label=f'MAE +{mae:.2f}')
+plt.plot(true_labels_age_nz, lower_bound_original, color='green', linestyle='--',
+         label=f'MAE -{mae:.2f}')
 plt.xlabel('True Age')
 plt.ylabel('Predicted Age')
 plt.title('Predicted vs. True Age')
 plt.legend()
+plt.savefig(f"MS3/Model/{modelType}/plot.png")
 plt.show()
-
+##
+years = np.unique(predicted_age_nz)
+years_mse = []
+for year in predicted_age_nz:
+    predicted_for_year = predicted_age_nz[true_labels_age_nz == year]
+    if len(predicted_for_year) > 0:
+        single_errors = predicted_age_nz[true_labels_age_nz == year] - year
+        years_mse.append(np.mean(np.abs(single_errors)))
+    else:
+        print("ERROR", year, predicted_for_year)
+print(years_mse)
+##
+incorrect_predictions_age = np.where(predicted_age_nz != true_labels_age_nz)[0]
+print("All", len(true_labels_age_nz))
+print("Incorrect", len(incorrect_predictions_age))
+print("Quotient", len(incorrect_predictions_age) / len(predicted_age_nz))
 ##
 # -- FIND FALSE PREDICTED IMAGES IN TEST SET ---------------------------------------------------------------------------
 # find index of the false predicted image
 incorrect_predictions_face = np.where(predicted_face != true_labels_face)[0]
-incorrect_predictions_age = np.where(predicted_age != true_labels_age)[0]
 incorrect_predictions_gender = np.where(predicted_gender != true_labels_gender)[0]
 
 # extract path for each image
