@@ -368,7 +368,7 @@ true_labels_age_nz = np.delete(true_labels_age, remove_zeros, axis=0)
 
 # Calculate MAE
 mae = mean_absolute_error(true_labels_age_nz, predicted_age_nz)
-
+print("MAE", mae)
 # Calculate upper and lower boundaries for MAE
 upper_bound_original = true_labels_age_nz + mae
 lower_bound_original = true_labels_age_nz - mae
