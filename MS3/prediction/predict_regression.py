@@ -50,6 +50,7 @@ promis = df['path']
 names = []
 for name in promis:
     name_split = name.split('/')
+    print(name_split)
     name_promi = name_split[4]
     names.append(name_promi)
 print(names)

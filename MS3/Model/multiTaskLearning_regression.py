@@ -356,16 +356,16 @@ print(predictions[2])
 # Extracting predicted ages from the predictions
 
 predicted_age = predictions[0].flatten()
-# predicted_face = predictions[1]
-# predicted_gender = predictions[2]
+predicted_gender = np.argmax(predictions[1], axis=1)
+predicted_face = np.argmax(predictions[2], axis=1)
 
 
 # Extracting true labels from the test dataset
 true_labels_age = np.concatenate([label['age_output'] for _, label in test_dataset], axis=0)
 ##
-# true_labels_gender = np.argmax(np.concatenate([label['gender_output'] for _, label in test_dataset], axis=0), axis=1)
-# true_labels_face = np.argmax(np.concatenate([label['face_output'] for _, label in test_dataset], axis=0), axis=1)
-
+true_labels_gender = np.argmax(np.concatenate([label['gender_output'] for _, label in test_dataset], axis=0), axis=1)
+true_labels_face = np.argmax(np.concatenate([label['face_output'] for _, label in test_dataset], axis=0), axis=1)
+##
 remove_zeros = np.where(true_labels_age == 0)[0]
 
 predicted_age = np.round(predicted_age).astype(int)
@@ -378,8 +378,8 @@ true_labels_age_nz = np.delete(true_labels_age, remove_zeros, axis=0)
 mae = mean_absolute_error(true_labels_age_nz, predicted_age_nz)
 print("MAE", mae)
 # Calculate upper and lower boundaries for MAE
-upper_bound_original = true_labels_age_nz + mae
-lower_bound_original = true_labels_age_nz - mae
+upper_bound_original = true_labels_age_nz + mae/2
+lower_bound_original = true_labels_age_nz - mae/2
 ##
 # Plotting predicted vs. true ages with MAE and ideal line
 plt.figure(figsize=(8, 6))
@@ -421,11 +421,11 @@ incorrect_predictions_gender = np.where(predicted_gender != true_labels_gender)[
 incorrect_image_paths_face = train_df['path'].iloc[test_size + val_size + incorrect_predictions_face].tolist()
 incorrect_image_paths_age = train_df['path'].iloc[test_size + val_size + incorrect_predictions_age].tolist()
 incorrect_image_paths_gender = train_df['path'].iloc[test_size + val_size + incorrect_predictions_gender].tolist()
-
+##
 # extract false predicted labels and true labels
 predicted_labels_face = predicted_face[incorrect_predictions_face]
 true_labels_face = true_labels_face[incorrect_predictions_face]
-
+##
 predicted_labels_age = predicted_age[incorrect_predictions_age]
 true_labels_age = true_labels_age[incorrect_predictions_age]
 
