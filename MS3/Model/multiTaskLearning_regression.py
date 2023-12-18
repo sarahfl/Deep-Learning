@@ -5,6 +5,7 @@ import tensorflow as tf
 import numpy as np
 import keras
 import os
+import cv2
 from sklearn.metrics import mean_absolute_error
 
 print(os.path.dirname(__file__))
@@ -159,13 +160,13 @@ class CustomMSE(tf.keras.losses.Loss):
 ##
 # -- COMPILE THE MODEL -------------------------------------------------------------------------------------------------
 
-def custom_mse(y_true, y_pred):
-    # Calculate the mean squared error only where y_true is non-zero
-    loss = tf.where(tf.math.not_equal(y_true, 0),
-                    # cast one to float or the other to int
-                    tf.reduce_mean(tf.square(tf.cast(y_true, tf.float32) - y_pred)),
-                    0.0)  # Set loss to 0 where y_true is 0
-    return loss
+# def custom_mse(y_true, y_pred):
+#    # Calculate the mean squared error only where y_true is non-zero
+#    loss = tf.where(tf.math.not_equal(y_true, 0),
+#                    # cast one to float or the other to int
+#                    tf.reduce_mean(tf.square(tf.cast(y_true, tf.float32) - y_pred)),
+#                    0.0)  # Set loss to 0 where y_true is 0
+#    return loss
 
 
 base_learning_rate = 0.0001
@@ -194,12 +195,11 @@ early_stopping_age = keras.callbacks.EarlyStopping(monitor='val_age_output_mae',
 # early_stopping_gender = keras.callbacks.EarlyStopping(monitor='val_gender_output_accuracy', patience=5, restore_best_weights=True)
 # early_stopping_face = keras.callbacks.EarlyStopping(monitor='val_face_output_accuracy', patience=5, restore_best_weights=True)
 
-data_amount = int(len(train_dataset) * 0.1)
 
-history = model.fit(train_dataset.take(data_amount),
+history = model.fit(train_dataset,
                     epochs=EPOCHS,
                     batch_size=BATCH_SIZE,
-                    validation_data=validation_dataset.take(data_amount),
+                    validation_data=validation_dataset,
                     callbacks=[early_stopping_age])
 ##
 age_loss = history.history['age_output_loss']
@@ -239,6 +239,7 @@ plt.ylabel('Loss')
 plt.legend()
 
 plt.tight_layout()
+plt.savefig(f"MS3/Model/{modelType}/plot_loss.png")
 plt.show()
 ##
 # -- SAVE HISTORY AND MODEL --------------------------------------------------------------------------------------------
@@ -299,7 +300,7 @@ model.save('MS3/Model/{}/model.keras'.format(modelType))
 ##
 # -- EVALUATE VALIDATION AND TEST DATA ---------------------------------------------------------------------------------
 eval_test = model.evaluate(test_dataset)
-eval_val = model.evaluate(validation_dataset.take(data_amount))
+eval_val = model.evaluate(validation_dataset)
 
 # Losses and Accuracies Test
 losses_test = eval_test[:3]
@@ -340,10 +341,17 @@ df_val.to_csv(csv_file_val, index=False)
 
 ##
 # predict test data
-#tf.keras.utils.get_custom_objects()['CustomMSE'] = CustomMSE
-#model = tf.keras.models.load_model('MS3/Model/{}/model.keras'.format(modelType))
+# tf.keras.utils.get_custom_objects()['CustomMSE'] = CustomMSE
+# model = tf.keras.models.load_model('MS3/Model/{}/model.keras'.format(modelType))
 
 predictions = model.predict(test_dataset)
+##
+x = cv2.imread('MS3/Model/data/UTKFace/21_0_face_9793.jpg')
+print(x.shape)
+predictions = model.predict(np.expand_dims(x, axis=0))
+print(predictions[0])
+print(predictions[1])
+print(predictions[2])
 ##
 # Extracting predicted ages from the predictions
 
@@ -378,14 +386,14 @@ plt.figure(figsize=(8, 6))
 plt.scatter(true_labels_age_nz, predicted_age_nz, alpha=0.3)
 plt.plot(true_labels_age_nz, true_labels_age_nz, color='red', linestyle='-', label='Ideal')
 plt.plot(true_labels_age_nz, upper_bound_original, color='green', linestyle='--',
-         label=f'MAE +{mae/2:.2f}')
+         label=f'MAE +{mae / 2:.2f}')
 plt.plot(true_labels_age_nz, lower_bound_original, color='green', linestyle='--',
-         label=f'MAE -{mae/2:.2f}')
+         label=f'MAE -{mae / 2:.2f}')
 plt.xlabel('True Age')
 plt.ylabel('Predicted Age')
 plt.title('Predicted vs. True Age')
 plt.legend()
-plt.savefig(f"MS3/Model/{modelType}/plot.png")
+plt.savefig(f"MS3/Model/{modelType}/plot_upper_lower.png")
 plt.show()
 ##
 years = np.unique(predicted_age_nz)

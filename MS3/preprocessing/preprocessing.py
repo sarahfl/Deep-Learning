@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from PIL import Image
 from PIL.Image import Resampling
+
+
 ##
 
 def promisToCSV_classification():
@@ -48,7 +50,7 @@ def promisToCSV_classification():
 
 
 def promisToCSV_regression():
-    path_to_prediction = '/home/sarah/Deep-Learning/MS3/prediction/deutschePromis'
+    path_to_prediction = 'MS3/Model/data/deutschePromis'
     df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
     for image in os.listdir(path_to_prediction):
         path = os.path.join(path_to_prediction, image)
@@ -65,7 +67,7 @@ def promisToCSV_regression():
             face = 0
 
         df = df._append({'path': path, 'age': age, 'gender': gender, 'face': face}, ignore_index=True)
-    df.to_csv('/home/sarah/Deep-Learning/MS3/prediction/deutschePromis_regression.csv')
+    df.to_csv('MS3/prediction/deutschePromis_regression.csv')
 
 
 def renameImages():
@@ -197,6 +199,7 @@ def createNoFaceCSV_classification():
 
     df.to_csv('Data/noFace_classification.csv')
 
+
 ##
 def createFaceCSV_regression():
     # get the path/directory
@@ -216,6 +219,7 @@ def createFaceCSV_regression():
 
     df.to_csv('MS3/Model/data/Face_regression.csv')
 
+
 ##
 def createNoFaceCSV_regression():
     # get the path/directory
@@ -228,6 +232,8 @@ def createNoFaceCSV_regression():
         df = df._append({'path': input_image, 'age': '0', 'gender': 2, 'face': 1}, ignore_index=True)
 
     df.to_csv('MS3/Model/data/noFace_regression.csv')
+
+
 ##
 
 def resizePIL(image_url):
