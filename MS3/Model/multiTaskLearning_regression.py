@@ -6,13 +6,14 @@ import numpy as np
 import keras
 import os
 import cv2
+from scipy import interpolate
 from sklearn.metrics import mean_absolute_error
 
 print(os.path.dirname(__file__))
-modelType = 'model2_regression'
+model_type = 'model2_regression'
 
-if not os.path.exists(f"MS3/Model/{modelType}"):
-    os.mkdir(f"MS3/Model/{modelType}")
+if not os.path.exists(f"MS3/Model/{model_type}"):
+    os.mkdir(f"MS3/Model/{model_type}")
 
 
 def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
@@ -183,7 +184,7 @@ model.summary()
 print('Anzahl der trainierbaren Variablen: ', len(model.trainable_variables))
 
 # save model summary to file
-with open('MS3/Model/{}/model_summary_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(modelType, base_learning_rate, EPOCHS,
+with open('MS3/Model/{}/model_summary_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(model_type, base_learning_rate, EPOCHS,
                                                                            BATCH_SIZE),
           'w') as f:
     model.summary(print_fn=lambda x: f.write(x + '\n'))
@@ -199,8 +200,7 @@ early_stopping_age = keras.callbacks.EarlyStopping(monitor='val_age_output_mae',
 history = model.fit(train_dataset,
                     epochs=EPOCHS,
                     batch_size=BATCH_SIZE,
-                    validation_data=validation_dataset,
-                    callbacks=[early_stopping_age])
+                    validation_data=validation_dataset)  # callbacks=[early_stopping_age]
 ##
 age_loss = history.history['age_output_loss']
 age_loss_val = history.history['val_age_output_loss']
@@ -239,7 +239,7 @@ plt.ylabel('Loss')
 plt.legend()
 
 plt.tight_layout()
-plt.savefig(f"MS3/Model/{modelType}/plot_loss.png")
+plt.savefig(f"MS3/Model/{model_type}/plot_loss.png")
 plt.show()
 ##
 # -- SAVE HISTORY AND MODEL --------------------------------------------------------------------------------------------
@@ -282,20 +282,20 @@ hist_df_face = pd.DataFrame({
 })
 
 # save each Dataframe to csv
-hist_csv_file_age = 'MS3/Model/{}/history_age.csv'.format(modelType)
+hist_csv_file_age = 'MS3/Model/{}/history_age.csv'.format(model_type)
 with open(hist_csv_file_age, mode='w') as f_age:
     hist_df_age.to_csv(f_age)
 
-hist_csv_file_gender = 'MS3/Model/{}/history_gender.csv'.format(modelType)
+hist_csv_file_gender = 'MS3/Model/{}/history_gender.csv'.format(model_type)
 with open(hist_csv_file_gender, mode='w') as f_gender:
     hist_df_gender.to_csv(f_gender)
 
-hist_csv_file_face = 'MS3/Model/{}/history_face.csv'.format(modelType)
+hist_csv_file_face = 'MS3/Model/{}/history_face.csv'.format(model_type)
 with open(hist_csv_file_face, mode='w') as f_face:
     hist_df_face.to_csv(f_face)
 
 # save whole model
-model.save('MS3/Model/{}/model.keras'.format(modelType))
+model.save('MS3/Model/{}/model.keras'.format(model_type))
 
 ##
 # -- EVALUATE VALIDATION AND TEST DATA ---------------------------------------------------------------------------------
@@ -334,24 +334,20 @@ print('Evalutation Test ----------------------------------')
 print(df_test)
 
 # save to csv
-csv_file_test = 'MS3/Model/{}/test_metrics.csv'.format(modelType)
-csv_file_val = 'MS3/Model/{}/validation_metrics.csv'.format(modelType)
+csv_file_test = 'MS3/Model/{}/test_metrics.csv'.format(model_type)
+csv_file_val = 'MS3/Model/{}/validation_metrics.csv'.format(model_type)
 df_test.to_csv(csv_file_test, index=False)
 df_val.to_csv(csv_file_val, index=False)
 
 ##
 # predict test data
 # tf.keras.utils.get_custom_objects()['CustomMSE'] = CustomMSE
-# model = tf.keras.models.load_model('MS3/Model/{}/model.keras'.format(modelType))
-
+# model = tf.keras.models.load_model('MS3/Model/{}/model.keras'.format(model_type))
 predictions = model.predict(test_dataset)
 ##
-x = cv2.imread('MS3/Model/data/UTKFace/21_0_face_9793.jpg')
-print(x.shape)
-predictions = model.predict(np.expand_dims(x, axis=0))
-print(predictions[0])
-print(predictions[1])
-print(predictions[2])
+# Predict single image for testing purposes
+# x = cv2.imread('MS3/Model/data/UTKFace/21_0_face_9793.jpg')
+# predictions = model.predict(np.expand_dims(x, axis=0))
 ##
 # Extracting predicted ages from the predictions
 
@@ -359,13 +355,11 @@ predicted_age = predictions[0].flatten()
 predicted_gender = np.argmax(predictions[1], axis=1)
 predicted_face = np.argmax(predictions[2], axis=1)
 
-
 # Extracting true labels from the test dataset
 true_labels_age = np.concatenate([label['age_output'] for _, label in test_dataset], axis=0)
-##
 true_labels_gender = np.argmax(np.concatenate([label['gender_output'] for _, label in test_dataset], axis=0), axis=1)
 true_labels_face = np.argmax(np.concatenate([label['face_output'] for _, label in test_dataset], axis=0), axis=1)
-##
+
 remove_zeros = np.where(true_labels_age == 0)[0]
 
 predicted_age = np.round(predicted_age).astype(int)
@@ -378,8 +372,8 @@ true_labels_age_nz = np.delete(true_labels_age, remove_zeros, axis=0)
 mae = mean_absolute_error(true_labels_age_nz, predicted_age_nz)
 print("MAE", mae)
 # Calculate upper and lower boundaries for MAE
-upper_bound_original = true_labels_age_nz + mae/2
-lower_bound_original = true_labels_age_nz - mae/2
+upper_bound_original = true_labels_age_nz + mae / 2
+lower_bound_original = true_labels_age_nz - mae / 2
 ##
 # Plotting predicted vs. true ages with MAE and ideal line
 plt.figure(figsize=(8, 6))
@@ -393,19 +387,67 @@ plt.xlabel('True Age')
 plt.ylabel('Predicted Age')
 plt.title('Predicted vs. True Age')
 plt.legend()
-plt.savefig(f"MS3/Model/{modelType}/plot_upper_lower.png")
+plt.savefig(f"MS3/Model/{model_type}/plot_upper_lower.png")
 plt.show()
 ##
 years = np.unique(predicted_age_nz)
-years_mse = []
-for year in predicted_age_nz:
+years_mae = []
+for year in years:
     predicted_for_year = predicted_age_nz[true_labels_age_nz == year]
-    if len(predicted_for_year) > 0:
-        single_errors = predicted_age_nz[true_labels_age_nz == year] - year
-        years_mse.append(np.mean(np.abs(single_errors)))
-    else:
-        print("ERROR", year, predicted_for_year)
-print(years_mse)
+    single_errors = predicted_age_nz[true_labels_age_nz == year] - year
+    MAE = np.mean(np.abs(single_errors))
+    years_mae.append(MAE)
+plt.figure(figsize=(8, 6))
+plt.plot(years, years_mae, color='red', linestyle='-', label='Years MSE')
+plt.xlabel('Year')
+plt.ylabel('MAE')
+plt.title('MAE/Year')
+plt.legend()
+plt.savefig(f"MS3/Model/{model_type}/plot_mae_year.png")
+plt.show()
+##
+years_mae_positive = []
+years_mae_negative = []
+for year in years:
+    predicted_for_year = predicted_age_nz[true_labels_age_nz == year]
+    single_errors = predicted_age_nz[true_labels_age_nz == year] - year
+    negative_errors = np.abs(single_errors[single_errors <= 0])
+    positive_errors = single_errors[single_errors >= 0]
+    years_mae_negative.append(np.mean(negative_errors))
+    years_mae_positive.append(np.mean(positive_errors))
+plt.figure(figsize=(8, 6))
+plt.plot(years, years_mae_positive, color='red', linestyle='-', label='Years MAE Positive')
+plt.plot(years, years_mae_negative, color='blue', linestyle='-', label='Years MAE Negative')
+plt.xlabel('Years')
+plt.ylabel('MAE')
+plt.title('Years MAE Split')
+plt.legend()
+plt.savefig(f"MS3/Model/{model_type}/plot_years_mae_split.png")
+plt.show()
+
+##
+# https://stackoverflow.com/questions/434287/how-to-iterate-over-a-list-in-chunks#answer-434328
+# Display in chunks for better readability
+# def chunker(seq, size):
+#    return (seq[pos:pos + size] for pos in range(0, len(seq), size))
+#
+#
+# chunk_years = []
+# chunk_mae_positive = []
+# chunk_mae_negative = []
+# for year_chunk in chunker(years, 10):
+#    chunk_years.append(max(year_chunk) + min(year_chunk) / 2)
+#    chunk_mae_positive.append(np.mean(np.array(years_mae_positive)[year_chunk]))
+#    chunk_mae_negative.append(np.mean(np.array(years_mae_negative)[year_chunk]))
+# plt.figure(figsize=(8, 6))
+# plt.plot(chunk_years, chunk_mae_positive, color='red', linestyle='-', label='Years MAE Positive')
+# plt.plot(chunk_years, chunk_mae_negative, color='blue', linestyle='-', label='Years MAE Negative')
+# plt.xlabel('Years')
+# plt.ylabel('MAE')
+# plt.title('Year Chunks MAE Split')
+# plt.legend()
+# plt.savefig(f"MS3/Model/{model_type}/plot_year_chunks_mae_split.png")
+# plt.show()
 ##
 incorrect_predictions_age = np.where(predicted_age_nz != true_labels_age_nz)[0]
 print("All", len(true_labels_age_nz))
@@ -447,14 +489,14 @@ df_incorrect_paths_gender = pd.DataFrame({'Image_Path': incorrect_image_paths_ge
 
 print('---------------------------------------------------------------------------------------------------------------')
 # save to csv
-csv_file_face = '/home/sarah/Deep-Learning/MS3/Model/{}/incorrect_predictions_face.csv'.format(modelType)
+csv_file_face = 'MS3/Model/{}/incorrect_predictions_face.csv'.format(model_type)
 df_incorrect_paths_face.to_csv(csv_file_face, index=False)
 print(f"Falsch vorhergesagte Bildpfade für Face wurden in '{csv_file_face}' gespeichert.")
 
-csv_file_age = '/home/sarah/Deep-Learning/MS3/Model/{}/incorrect_predictions_age.csv'.format(modelType)
+csv_file_age = 'MS3/Model/{}/incorrect_predictions_age.csv'.format(model_type)
 df_incorrect_paths_age.to_csv(csv_file_age, index=False)
 print(f"Falsch vorhergesagte Bildpfade für Age wurden in '{csv_file_age}' gespeichert.")
 
-csv_file_gender = '/home/sarah/Deep-Learning/MS3/Model/{}/incorrect_predictions_gender.csv'.format(modelType)
+csv_file_gender = 'MS3/Model/{}/incorrect_predictions_gender.csv'.format(model_type)
 df_incorrect_paths_gender.to_csv(csv_file_gender, index=False)
 print(f"Falsch vorhergesagte Bildpfade für Gender wurden in '{csv_file_gender}' gespeichert.")
