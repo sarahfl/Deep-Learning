@@ -1,0 +1,10 @@
+,path,age,gender,face
+0,/home/sarah/Deep-Learning/MS3/prediction/starWars/0_2_C3PO.jpg,age7,2,0
+1,/home/sarah/Deep-Learning/MS3/prediction/starWars/34_0_comickenobi.jpg,age4,0,0
+2,/home/sarah/Deep-Learning/MS3/prediction/starWars/24_0_anakin.jpg,age3,0,0
+3,/home/sarah/Deep-Learning/MS3/prediction/starWars/34_0_kenobi.jpg,age4,0,0
+4,/home/sarah/Deep-Learning/MS3/prediction/starWars/44_1_ahsoka.jpg,age4,1,0
+5,/home/sarah/Deep-Learning/MS3/prediction/starWars/25_1_rey.jpg,age3,1,0
+6,/home/sarah/Deep-Learning/MS3/prediction/starWars/0_2_yoda.jpg,age7,2,0
+7,/home/sarah/Deep-Learning/MS3/prediction/starWars/21_0_comicanakin.jpg,age3,0,0
+8,/home/sarah/Deep-Learning/MS3/prediction/starWars/15_1_comicahsoka.jpeg,age2,1,0
