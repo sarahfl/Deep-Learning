@@ -70,6 +70,27 @@ def promisToCSV_regression():
     df.to_csv('MS3/prediction/deutschePromis_regression.csv')
 
 
+def starWarsToCSV_regression():
+    path_to_prediction = 'MS3/Model/data/starWars'
+    df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
+    for image in os.listdir(path_to_prediction):
+        path = os.path.join(path_to_prediction, image)
+
+        image_split = image.split("_")
+        age = int(image_split[0])
+        gender = int(image_split[1])
+        name = image_split[2]
+
+        face = 0
+        if name == 'elmo.jpg':
+            face = 1
+        else:
+            face = 0
+
+        df = df._append({'path': path, 'age': age, 'gender': gender, 'face': face}, ignore_index=True)
+    df.to_csv('MS3/prediction/starWars_regression.csv')
+
+
 def renameImages():
     # get the path/directory
     path_in = "/home/sarah/Desktop/UTKFace"

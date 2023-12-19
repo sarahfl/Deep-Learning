@@ -43,48 +43,50 @@ tf.keras.utils.get_custom_objects()['CustomMSE'] = CustomMSE
 model = tf.keras.models.load_model(f'MS3/Model/{model_type}/model.keras')
 
 # read promi dataset
-df = pd.read_csv(f'MS3/prediction/deutschePromis_regression.csv', index_col=0)
+for file_path, file_name in [('MS3/prediction/deutschePromis_regression.csv', "deutschePromis"),
+                             ('MS3/prediction/starWars_regression.csv', "starWars")]:
+    df = pd.read_csv(file_path, index_col=0)
 
-# get promi names
-promis = df['path']
-names = []
-for name in promis:
-    name_split = name.split('/')
-    print(name_split)
-    name_promi = name_split[4]
-    names.append(name_promi)
-print(names)
+    # get promi names
+    promis = df['path']
+    names = []
+    for name in promis:
+        name_split = name.split('/')
+        print(name_split)
+        name_promi = name_split[4]
+        names.append(name_promi)
+    print(names)
 
-# -- MAKE DATASET AND ONE-HOT-ENCODING ---------------------------------------------------------------------------------
-age = df['age'].values.astype(int)
-one_hot_gender = pd.get_dummies(df['gender']).astype(int)
-one_hot_face = pd.get_dummies(df['face']).astype(int)
+    # -- MAKE DATASET AND ONE-HOT-ENCODING ---------------------------------------------------------------------------------
+    age = df['age'].values.astype(int)
+    one_hot_gender = pd.get_dummies(df['gender']).astype(int)
+    one_hot_face = pd.get_dummies(df['face']).astype(int)
 
-one_hot_gender = one_hot_gender.to_numpy()
-one_hot_face = one_hot_face.to_numpy()
+    one_hot_gender = one_hot_gender.to_numpy()
+    one_hot_face = one_hot_face.to_numpy()
 
-dataset = tf.data.Dataset.from_tensor_slices((df['path'].values, age, one_hot_gender, one_hot_face))
-dataset = dataset.map(load_and_preprocess_image)
-print('Aufbau des Datensets: ', dataset.element_spec)
-dataset = dataset.batch(BATCH_SIZE)
+    dataset = tf.data.Dataset.from_tensor_slices((df['path'].values, age, one_hot_gender, one_hot_face))
+    dataset = dataset.map(load_and_preprocess_image)
+    print('Aufbau des Datensets: ', dataset.element_spec)
+    dataset = dataset.batch(BATCH_SIZE)
 
-# -- PREDICTION --------------------------------------------------------------------------------------------------------
-predictions = model.predict(dataset)
+    # -- PREDICTION --------------------------------------------------------------------------------------------------------
+    predictions = model.predict(dataset)
 
-age_array, gender_array, face_array = evaluate_predictions.evaluate(predictions)
+    age_array, gender_array, face_array = evaluate_predictions.evaluate(predictions)
 
-fig, axs = plt.subplots(3, 3, figsize=(10, 10))
-plt.subplots_adjust(top=0.92, bottom=0.08, left=0.10, right=0.95, hspace=0.4, wspace=0.35)
-for i in range(3):
-    for j in range(3):
-        index = i * 3 + j
+    fig, axs = plt.subplots(3, 3, figsize=(10, 10))
+    plt.subplots_adjust(top=0.92, bottom=0.08, left=0.10, right=0.95, hspace=0.4, wspace=0.35)
+    for i in range(3):
+        for j in range(3):
+            index = i * 3 + j
 
-        img = mpimg.imread(promis[index])
-        axs[i, j].imshow(img)
-        axs[i, j].axis('off')
+            img = mpimg.imread(promis[index])
+            axs[i, j].imshow(img)
+            axs[i, j].axis('off')
 
-        # title
-        title = f"Age: {age_array[index]}, Gender: {gender_array[index]}, Face: {face_array[index]}"
-        axs[i, j].set_title(title)
-plt.savefig('MS3/Model/{}/promis_regression.png'.format(model_type))
-plt.show()
+            # title
+            title = f"Age: {age_array[index]}, Gender: {gender_array[index]}, Face: {face_array[index]}"
+            axs[i, j].set_title(title)
+    plt.savefig('MS3/Model/{}/{}_regression.png'.format(model_type, file_name))
+    plt.show()
