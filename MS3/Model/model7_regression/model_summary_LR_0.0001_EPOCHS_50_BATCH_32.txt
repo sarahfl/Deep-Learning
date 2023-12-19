@@ -23,16 +23,30 @@ ________________________________________________________________________________
                                                                                                   
  dropout (Dropout)           (None, 1280)                 0         ['dense[0][0]']               
                                                                                                   
- dropout_1 (Dropout)         (None, 1280)                 0         ['dropout[0][0]']             
+ dense_1 (Dense)             (None, 640)                  819840    ['dropout[0][0]']             
                                                                                                   
- age_output (Dense)          (None, 1)                    1281      ['dropout_1[0][0]']           
+ dropout_1 (Dropout)         (None, 640)                  0         ['dense_1[0][0]']             
+                                                                                                  
+ dense_2 (Dense)             (None, 320)                  205120    ['dropout_1[0][0]']           
+                                                                                                  
+ dropout_2 (Dropout)         (None, 320)                  0         ['dense_2[0][0]']             
+                                                                                                  
+ dense_3 (Dense)             (None, 160)                  51360     ['dropout_2[0][0]']           
+                                                                                                  
+ dropout_3 (Dropout)         (None, 160)                  0         ['dense_3[0][0]']             
+                                                                                                  
+ dense_4 (Dense)             (None, 80)                   12880     ['dropout_3[0][0]']           
+                                                                                                  
+ dropout_4 (Dropout)         (None, 80)                   0         ['dense_4[0][0]']             
+                                                                                                  
+ age_output (Dense)          (None, 1)                    81        ['dropout_4[0][0]']           
                                                                                                   
  gender_output (Dense)       (None, 3)                    3843      ['dropout[0][0]']             
                                                                                                   
  face_output (Dense)         (None, 2)                    2562      ['dropout[0][0]']             
                                                                                                   
 ==================================================================================================
-Total params: 3905350 (14.90 MB)
-Trainable params: 3007366 (11.47 MB)
+Total params: 4993350 (19.05 MB)
+Trainable params: 4095366 (15.62 MB)
 Non-trainable params: 897984 (3.43 MB)
 __________________________________________________________________________________________________

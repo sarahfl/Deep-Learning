@@ -10,7 +10,7 @@ from scipy import interpolate
 from sklearn.metrics import mean_absolute_error
 
 print(os.path.dirname(__file__))
-model_type = 'model6_regression'
+model_type = 'model7_regression'
 
 if not os.path.exists(f"MS3/Model/{model_type}"):
     os.mkdir(f"MS3/Model/{model_type}")
@@ -130,13 +130,16 @@ x = tf.keras.layers.Dense(1280, activation='relu')(x)
 x = tf.keras.layers.Dropout(0.5)(x)
 
 x_age = tf.keras.layers.Dense(640, activation='relu')(x)
+x_age = tf.keras.layers.Dropout(0.5)(x_age)
 x_age = tf.keras.layers.Dense(320, activation='relu')(x_age)
+x_age = tf.keras.layers.Dropout(0.5)(x_age)
 x_age = tf.keras.layers.Dense(160, activation='relu')(x_age)
+x_age = tf.keras.layers.Dropout(0.5)(x_age)
 x_age = tf.keras.layers.Dense(80, activation='relu')(x_age)
-x_age = tf.keras.layers.Dropout(0.8)(x_age)
+x_age = tf.keras.layers.Dropout(0.5)(x_age)
 
 # OUTPUT AGE
-output_age = tf.keras.layers.Dense(1, activation='linear', name='age_output')(x_age)
+output_age = tf.keras.layers.Dense(1, activation='linear', name='age_output')(x_age) # x
 
 # OUTPUT GENDER
 output_gender = tf.keras.layers.Dense(3, activation='softmax', name='gender_output')(x)
