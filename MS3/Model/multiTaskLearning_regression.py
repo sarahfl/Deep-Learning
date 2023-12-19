@@ -10,7 +10,7 @@ from scipy import interpolate
 from sklearn.metrics import mean_absolute_error
 
 print(os.path.dirname(__file__))
-model_type = 'model2_regression'
+model_type = 'model6_regression'
 
 if not os.path.exists(f"MS3/Model/{model_type}"):
     os.mkdir(f"MS3/Model/{model_type}")
@@ -54,6 +54,12 @@ train_df = df.sample(frac=1)
 age_labels = train_df['age'].values.astype(int)
 one_hot_gender = pd.get_dummies(train_df['gender']).astype(int)
 one_hot_face = pd.get_dummies(train_df['face']).astype(int)
+
+# Begin of Normalize
+# age_mean = age_labels.mean()
+# age_std = age_labels.std()
+# age_labels = (age_labels - age_mean) / age_std  # Normalize using mean and standard deviation
+# End of Normalize
 
 # convert to numpy-array
 one_hot_gender = one_hot_gender.to_numpy()
@@ -127,7 +133,7 @@ x_age = tf.keras.layers.Dense(640, activation='relu')(x)
 x_age = tf.keras.layers.Dense(320, activation='relu')(x_age)
 x_age = tf.keras.layers.Dense(160, activation='relu')(x_age)
 x_age = tf.keras.layers.Dense(80, activation='relu')(x_age)
-x_age = tf.keras.layers.Dropout(0.5)(x_age)
+x_age = tf.keras.layers.Dropout(0.8)(x_age)
 
 # OUTPUT AGE
 output_age = tf.keras.layers.Dense(1, activation='linear', name='age_output')(x_age)
@@ -192,7 +198,7 @@ with open('MS3/Model/{}/model_summary_LR_{}_EPOCHS_{}_BATCH_{}.txt'.format(model
 ##
 # -- TRAIN THE MODEL ---------------------------------------------------------------------------------------------------
 # Early Stopping Callback
-early_stopping_age = keras.callbacks.EarlyStopping(monitor='val_age_output_mae', patience=5, restore_best_weights=True)
+early_stopping_age = keras.callbacks.EarlyStopping(monitor='val_age_output_mae', patience=10, restore_best_weights=True)
 # early_stopping_gender = keras.callbacks.EarlyStopping(monitor='val_gender_output_accuracy', patience=5, restore_best_weights=True)
 # early_stopping_face = keras.callbacks.EarlyStopping(monitor='val_face_output_accuracy', patience=5, restore_best_weights=True)
 
@@ -200,7 +206,8 @@ early_stopping_age = keras.callbacks.EarlyStopping(monitor='val_age_output_mae',
 history = model.fit(train_dataset,
                     epochs=EPOCHS,
                     batch_size=BATCH_SIZE,
-                    validation_data=validation_dataset)  # callbacks=[early_stopping_age]
+                    validation_data=validation_dataset,
+                    callbacks=[early_stopping_age])  # callbacks=[early_stopping_age]
 ##
 age_loss = history.history['age_output_loss']
 age_loss_val = history.history['val_age_output_loss']
@@ -349,7 +356,7 @@ predictions = model.predict(test_dataset)
 # x = cv2.imread('MS3/Model/data/UTKFace/21_0_face_9793.jpg')
 # predictions = model.predict(np.expand_dims(x, axis=0))
 ##
-# Extracting predicted ages from the predictions
+# Extracting predictions
 
 predicted_age = predictions[0].flatten()
 predicted_gender = np.argmax(predictions[1], axis=1)
@@ -360,13 +367,17 @@ true_labels_age = np.concatenate([label['age_output'] for _, label in test_datas
 true_labels_gender = np.argmax(np.concatenate([label['gender_output'] for _, label in test_dataset], axis=0), axis=1)
 true_labels_face = np.argmax(np.concatenate([label['face_output'] for _, label in test_dataset], axis=0), axis=1)
 
+# De-Normalize
+# predicted_age = predicted_age * age_std + age_mean
+# true_labels_age = true_labels_age * age_std + age_mean
+# true_labels_age_original = np.round(true_labels_age).astype(int)
+# End De-Normalize
+predicted_age = np.round(predicted_age).astype(int)
+
 remove_zeros = np.where(true_labels_age == 0)[0]
 
-predicted_age = np.round(predicted_age).astype(int)
-# true_labels_age_original = np.round(true_labels_age).astype(int)
-
-predicted_age_nz = np.delete(predicted_age, remove_zeros, axis=0)
 true_labels_age_nz = np.delete(true_labels_age, remove_zeros, axis=0)
+predicted_age_nz = np.delete(predicted_age, remove_zeros, axis=0)
 
 # Calculate MAE
 mae = mean_absolute_error(true_labels_age_nz, predicted_age_nz)
@@ -453,6 +464,7 @@ incorrect_predictions_age = np.where(predicted_age_nz != true_labels_age_nz)[0]
 print("All", len(true_labels_age_nz))
 print("Incorrect", len(incorrect_predictions_age))
 print("Quotient", len(incorrect_predictions_age) / len(predicted_age_nz))
+exit(0)
 ##
 # -- FIND FALSE PREDICTED IMAGES IN TEST SET ---------------------------------------------------------------------------
 # find index of the false predicted image
