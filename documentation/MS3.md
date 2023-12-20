@@ -67,11 +67,9 @@ face = [0,1], wobei 0=Gesicht, 1=kein Gesicht
 age = [0..116], wobei 0=Alter kann nicht zugeordnet werden
 
 ### Regression Model
-TODO: Regression Model brauen
+multiTaskLearning_regression.py ausführen
 
 ### Model auf deutschem Promi-Datenset testen
 Promi-Datenset herunterladen: https://drive.google.com/file/d/1V8r50K1JF_DHNqq4mzetxjoxgnC4eyYm/view?usp=sharing
 Entpacken und csv-Datei erstellen mit preprocessing/preprocessing.py
 - promisToCSV_regression()
-
-TODO: predict_regression.py erstellen und predictions ausgeben lassen
