@@ -1,3 +1,4 @@
+##
 import cv2
 import os
 from tqdm import tqdm
@@ -6,6 +7,8 @@ import pandas as pd
 from PIL import Image
 from PIL.Image import Resampling
 
+
+##
 
 def promisToCSV_classification():
     path_to_prediction = '/home/sarah/Deep-Learning/MS3/prediction/deutschePromis'
@@ -45,8 +48,9 @@ def promisToCSV_classification():
         df = df._append({'path': path, 'age': result, 'gender': gender, 'face': face}, ignore_index=True)
     df.to_csv('/home/sarah/Deep-Learning/MS3/prediction/deutschePromis_classification.csv')
 
+
 def promisToCSV_regression():
-    path_to_prediction = '/home/sarah/Deep-Learning/MS3/prediction/deutschePromis'
+    path_to_prediction = 'MS3/Model/data/deutschePromis'
     df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
     for image in os.listdir(path_to_prediction):
         path = os.path.join(path_to_prediction, image)
@@ -63,7 +67,29 @@ def promisToCSV_regression():
             face = 0
 
         df = df._append({'path': path, 'age': age, 'gender': gender, 'face': face}, ignore_index=True)
-    df.to_csv('/home/sarah/Deep-Learning/MS3/prediction/deutschePromis_regression.csv')
+    df.to_csv('MS3/prediction/deutschePromis_regression.csv')
+
+
+def starWarsToCSV_regression():
+    path_to_prediction = 'MS3/Model/data/starWars'
+    df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
+    for image in os.listdir(path_to_prediction):
+        path = os.path.join(path_to_prediction, image)
+
+        image_split = image.split("_")
+        age = int(image_split[0])
+        gender = int(image_split[1])
+        name = image_split[2]
+
+        face = 0
+        if name == 'elmo.jpg':
+            face = 1
+        else:
+            face = 0
+
+        df = df._append({'path': path, 'age': age, 'gender': gender, 'face': face}, ignore_index=True)
+    df.to_csv('MS3/prediction/starWars_regression.csv')
+
 
 def renameImages():
     # get the path/directory
@@ -86,6 +112,7 @@ def renameImages():
         cv2.imwrite(os.path.join(path_out, filename), img)
         cv2.waitKey(0)
 
+
 def ageDistribution():
     df_face = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/Data/Face_classification.csv', index_col=0)
     df_noFace = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/Data/noFace_classification.csv', index_col=0)
@@ -101,23 +128,23 @@ def ageDistribution():
     age6 = df.count('age6')
     age7 = df.count('age7')
 
-
     age = ['1-2', '3-9', '10-20', '21-27', '28-45', '46-65', '66-116', 'no age']
     counts = [age0, age1, age2, age3, age4, age5, age6, age7]
     fontsize = 20
 
     plt.figure(figsize=(40, 18))
     bar_colors = ['tab:blue', 'tab:blue', 'tab:blue', 'tab:blue', 'tab:blue', 'tab:blue', 'tab:blue', 'tab:orange']
-    plt.bar(age, counts, color = bar_colors)
+    plt.bar(age, counts, color=bar_colors)
     plt.title("Distribution of Age in UTKFace", fontsize=fontsize)
     plt.xlabel("Age", fontsize=fontsize)
     plt.ylabel("Number of Images", fontsize=fontsize)
 
-    plt.xticks( fontsize=fontsize)
+    plt.xticks(fontsize=fontsize)
     plt.yticks(fontsize=fontsize)
 
     plt.savefig('plots/age_distribution_classification.png')
     plt.show()
+
 
 def genderDistribution():
     df_face = pd.read_csv('/home/sarah/Deep-Learning/MS3/preprocessing/Data/Face_classification.csv', index_col=0)
@@ -144,6 +171,7 @@ def genderDistribution():
     plt.savefig('plots/gender_distribution.png')
 
     plt.show()
+
 
 def createFaceCSV_classification():
     # get the path/directory
@@ -179,6 +207,7 @@ def createFaceCSV_classification():
 
     df.to_csv('Data/Face_classification.csv')
 
+
 def createNoFaceCSV_classification():
     # get the path/directory
     path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/noFace"
@@ -191,9 +220,11 @@ def createNoFaceCSV_classification():
 
     df.to_csv('Data/noFace_classification.csv')
 
+
+##
 def createFaceCSV_regression():
     # get the path/directory
-    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/UTKFace"
+    path_in = "MS3/Model/data/UTKFace"
     df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
 
     for image in tqdm(os.listdir(path_in)):
@@ -207,11 +238,13 @@ def createFaceCSV_regression():
 
         df = df._append({'path': input_image, 'age': age, 'gender': gender, 'face': 0}, ignore_index=True)
 
-    df.to_csv('Data/Face_regression.csv')
+    df.to_csv('MS3/Model/data/Face_regression.csv')
 
+
+##
 def createNoFaceCSV_regression():
     # get the path/directory
-    path_in = "/home/sarah/Deep-Learning/MS3/preprocessing/MS3_rawData/noFace"
+    path_in = "MS3/Model/data/noFace"
     df = pd.DataFrame(columns=['path', 'age', 'gender', 'face'])
 
     for image in tqdm(os.listdir(path_in)):
@@ -219,7 +252,10 @@ def createNoFaceCSV_regression():
 
         df = df._append({'path': input_image, 'age': '0', 'gender': 2, 'face': 1}, ignore_index=True)
 
-    df.to_csv('Data/noFace_regression.csv')
+    df.to_csv('MS3/Model/data/noFace_regression.csv')
+
+
+##
 
 def resizePIL(image_url):
     with Image.open(image_url) as im:
@@ -236,6 +272,3 @@ for image in tqdm(os.listdir(path_in)):
     input_image = os.path.join(path_in, image)
     resizedImage = resizePIL(input_image)
     resizedImage.save(os.path.join(path_out, image))'''
-
-
-
