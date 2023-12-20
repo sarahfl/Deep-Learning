@@ -1,0 +1,1 @@
+Trained without early stopping, result got worse (but only by a very little tiny bit)
