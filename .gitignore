@@ -170,3 +170,4 @@ MS3_rawData
 *.keras
 deutschePromis
 /MS3/Model/data/
+/MS4/data
