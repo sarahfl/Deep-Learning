@@ -167,6 +167,7 @@ Train_Test_Folder_2/
 MS2/resNet/resnet50_model.h5
 MS3_Train_Test_Folder/
 MS3_rawData
+MS4/data
 *.keras
 deutschePromis
 starWars
