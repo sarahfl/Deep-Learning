@@ -3,8 +3,11 @@
 - https://pyimagesearch.com/2020/11/30/siamese-networks-with-keras-tensorflow-and-deep-learning/
 
 ## Data
+Link zu Promi-Bildern: https://drive.google.com/file/d/1Y0QDP5v5HKzDrmWtFfgbMOj6siMwi4VX/view?usp=sharing
 
+Link zu den anderen Gesichtern: https://drive.google.com/file/d/1mHUPBgSU6pMqj6jF7zHIDm8xq0ZXbqvh/view?usp=sharing
 
+Die Bilder können mit preprocessing/preprocessing.py imagesToCSV() in CSV-Datein eingelesen werden.
 
 ### Info zu CelebA:
 - https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg?resourcekey=0-rJlzl934LzC-Xp28GeIBzQ
