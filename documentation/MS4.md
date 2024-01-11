@@ -9,6 +9,12 @@ Link zu den anderen Gesichtern: https://drive.google.com/file/d/1mHUPBgSU6pMqj6j
 
 Die Bilder können mit preprocessing/preprocessing.py imagesToCSV() in CSV-Datein eingelesen werden.
 
+
+## Doppelgänger Testbilder
+Link: https://drive.google.com/file/d/1NwIhlDBXjQLdVRJM7lzGjJHJSIrbFkpy/view?usp=sharing
+Die Zahl am Ende jedes Bildernames bestimmt welche Bilder zusammenghören.
+Beispiel: DemiMoore_4.jpg und JenniferConnelly_4.jpg gehören zusammen
+
 ### Info zu CelebA:
 - https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaXdaSnZBZzg?resourcekey=0-rJlzl934LzC-Xp28GeIBzQ
 - Bildcodierung `{fortlaufende_nummer}_{identität}.jpg`
