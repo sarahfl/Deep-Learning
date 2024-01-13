@@ -7,7 +7,7 @@ from PIL.Image import Resampling
 import pandas as pd
 
 
-def resizePIL(image_url):
+def resize_pil(image_url):
     with Image.open(image_url) as im:
         # Provide the target width and height of the image
         (width, height) = (200, 200)
@@ -15,7 +15,7 @@ def resizePIL(image_url):
         return im_resized
 
 
-def copyImages(source, destination):
+def copy_images(source, destination):
     i = 0
     for image in tqdm(os.listdir(source)):
         input_image = os.path.join(source, image)
@@ -31,7 +31,7 @@ def copyImages(source, destination):
             cv2.waitKey(0)
 
 
-def takeSampleImages(source, destination, count):
+def take_sample_images(source, destination, count):
     images = [f for f in os.listdir(source) if os.path.isfile(os.path.join(source, f))]
 
     random_images = random.sample(images, count)
@@ -44,7 +44,7 @@ def takeSampleImages(source, destination, count):
         i = i + 1
 
 
-def imagesToCSV(source_promis, source_face, destination_csv):
+def images_to_csv(source_promis, source_face, destination_csv):
     # promis
     df_promis = pd.DataFrame(columns=['path', 'name'])
     for image in os.listdir(source_promis):
@@ -68,8 +68,8 @@ def imagesToCSV(source_promis, source_face, destination_csv):
     df_faces.to_csv(destination_csv + '/faces.csv')
 
 
-source_promis = '/home/sarah/Desktop/promis'
-source_faces = '/home/sarah/Desktop/faces'
-destination_csv = '/home/sarah/Deep-Learning/MS4/preprocessing'
+SOURCE_PROMIS = '/home/sarah/Desktop/promis'
+SOURCES_FACES = '/home/sarah/Desktop/faces'
+DESTINATION_CSV = 'MS4/preprocessing'
 
-imagesToCSV(source_promis, source_faces, destination_csv)
+images_to_csv(SOURCE_PROMIS, SOURCES_FACES, DESTINATION_CSV)

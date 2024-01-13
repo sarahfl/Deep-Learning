@@ -1,6 +1,35 @@
-import tensorflow.keras.backend as K
+import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+
+
+def load_and_preprocess_image(image_path, label_age, label_gender, label_face):
+    """
+    Apply tensor transformation on image.
+    :param image_path: absolut path to file
+    :param label_age: output channel age
+    :param label_gender: output channel gender
+    :param label_face: output channel face
+    :return: Image as 3D tensor and dictionary of labels which includes the mapping of labels to output channels
+    """
+    img = tf.image.decode_jpeg(tf.io.read_file(image_path), channels=3)  # image to tensor
+    img = tf.image.resize(img, [200, 200])  # define image size
+    return img, {'age_output': label_age, 'gender_output': label_gender, 'face_output': label_face}
+
+
+def read_csv():
+    df_face = pd.read_csv('MS3/Model/data/Face_regression.csv', index_col=0)
+    df_no_face = pd.read_csv('MS3/Model/data/noFace_regression.csv', index_col=0)
+    # delta = len(df_no_face) - 12500
+    # drop_indices = np.random.choice(df_no_face.index, delta, replace=False)
+    # df_subset_noFace = df_no_face.drop(drop_indices)
+
+    df = pd.concat([df_face, df_no_face], axis=0, ignore_index=True)
+
+    # shuffle dataframe
+    train_df = df.sample(frac=1)
+    return train_df
 
 
 def make_pairs(images, labels):
@@ -43,10 +72,10 @@ def euclidean_distance(vectors):
     # unpack the vectors into separate lists
     (featsA, featsB) = vectors
     # compute the sum of squared distances between the vectors
-    sum_squared = K.sum(K.square(featsA - featsB), axis=1,
-                        keepdims=True)
+    sum_squared = tf.keras.backend.sum(tf.keras.backend.square(featsA - featsB), axis=1,
+                                       keepdims=True)
     # return the Euclidean distance between the vectors
-    return K.sqrt(K.maximum(sum_squared, K.epsilon()))
+    return tf.keras.backend.sqrt(tf.keras.backend.maximum(sum_squared, tf.keras.backend.epsilon()))
 
 
 def plot_training(history, plot_path):
