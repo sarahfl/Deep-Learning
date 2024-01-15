@@ -10,6 +10,8 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Lambda
 from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.data import AUTOTUNE
+from tensorflow.data import Dataset
 from tensorflow.keras.datasets import mnist
 import numpy as np
 import logging
@@ -26,20 +28,36 @@ logging.basicConfig(
     ]
 )
 
-logging.info("[INFO] loading MNIST dataset...")
-(trainX, trainY), (testX, testY) = mnist.load_data()  # ~/.keras/datasets/mnist.npz
 
-# utils.display_image(trainX, trainY, 7)
+def do_mnist():
+    logging.info("[INFO] loading MNIST dataset...")
+    (trainX, trainY), (testX, testY) = mnist.load_data()  # ~/.keras/datasets/mnist.npz
 
-trainX = trainX / 255.0  # scale [0-1]
-testX = testX / 255.0  # scale [0-1]
-# add a channel dimension to the images
-trainX = np.expand_dims(trainX, axis=-1)
-testX = np.expand_dims(testX, axis=-1)
-# prepare the positive and negative pairs
-logging.info("Preparing positive and negative pairs...")
-(pairTrain, labelTrain) = utils.make_pairs(trainX, trainY)
-(pairTest, labelTest) = utils.make_pairs(testX, testY)
+    # utils.display_image(trainX, trainY, 7)
+
+    trainX = trainX / 255.0  # scale [0-1]
+    testX = testX / 255.0  # scale [0-1]
+    # add a channel dimension to the images
+    trainX = np.expand_dims(trainX, axis=-1)
+    testX = np.expand_dims(testX, axis=-1)
+    # prepare the positive and negative pairs
+    logging.info("Preparing positive and negative pairs...")
+    (pairTrain, labelTrain) = utils.make_pairs(trainX, trainY)
+    (pairTest, labelTest) = utils.make_pairs(testX, testY)
+
+
+def do_promis():
+    logging.info("[INFO] loading promis dataset...")
+    df = utils.read_csv()
+    df["image"] = df["path"].apply(utils.load_and_preprocess_image)
+    df['name'] = df['name'].astype('category').cat.codes
+    print(df['name'])
+    (pairTrain, labelTrain) = utils.make_pairs(df['image'], df['name'])
+    (pairTest, labelTest) = utils.make_pairs(df['image'], df['name'])
+    return (pairTrain, labelTrain), (pairTest, labelTest)
+
+
+(pairTrain, labelTrain), (pairTest, labelTest) = do_promis()
 
 # configure siamese
 logging.info("Building siamese network...")

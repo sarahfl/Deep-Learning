@@ -68,8 +68,8 @@ def images_to_csv(source_promis, source_face, destination_csv):
     df_faces.to_csv(destination_csv + '/faces.csv')
 
 
-SOURCE_PROMIS = '/home/sarah/Desktop/promis'
-SOURCES_FACES = '/home/sarah/Desktop/faces'
+SOURCE_PROMIS = 'MS4/data/promis'
+SOURCES_FACES = 'MS4/data/faces'
 DESTINATION_CSV = 'MS4/preprocessing'
 
 images_to_csv(SOURCE_PROMIS, SOURCES_FACES, DESTINATION_CSV)
