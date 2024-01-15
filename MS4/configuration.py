@@ -14,3 +14,4 @@ MODEL_PATH = os.path.join(BASE_OUTPUT, "siamese_model")
 PLOT_PATH = os.path.join(BASE_OUTPUT, "plot.png")
 
 LOG_PATH = os.path.join(BASE_OUTPUT, 'ms4.log')
+
