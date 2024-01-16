@@ -51,13 +51,28 @@ def do_promis():
     df = utils.read_csv()
     df["image"] = df["path"].apply(utils.load_and_preprocess_image)
     df['name'] = df['name'].astype('category').cat.codes
-    print(df['name'])
-    (pairTrain, labelTrain) = utils.make_pairs(df['image'], df['name'])
-    (pairTest, labelTest) = utils.make_pairs(df['image'], df['name'])
-    return (pairTrain, labelTrain), (pairTest, labelTest)
+
+    # pair is a list of image pairs
+    # label is whether they are showing the same person or not
+    pair, label = utils.make_pairs(df['image'], df['name'])
+
+    dataset_size = len(label)
+    train_size = int(0.7 * dataset_size)
+    val_size = int(0.15 * dataset_size)
+    test_size = dataset_size - train_size - val_size
+
+    pair_train = pair[:train_size]
+    pair_val = pair[train_size:train_size+val_size]
+    pair_test = pair[train_size + val_size:]
+
+    label_train = label[:train_size]
+    label_val = label[train_size:train_size+val_size]
+    label_test = label[train_size + val_size:]
+
+    return (pair_train, label_train), (pair_val, label_val), (pair_test, label_test)
 
 
-(pairTrain, labelTrain), (pairTest, labelTest) = do_promis()
+(pair_train, label_train), (pair_val, label_val), (pair_test, val_test) = do_promis()
 
 # configure siamese
 logging.info("Building siamese network...")
@@ -68,7 +83,6 @@ imgB = Input(shape=configuration.IMG_SHAPE)
 featureExtractor = build_siamese_model(configuration.IMG_SHAPE)
 featsA = featureExtractor(imgA)
 featsB = featureExtractor(imgB)
-
 distance = Lambda(utils.euclidean_distance)([featsA, featsB])
 outputs = Dense(1, activation="sigmoid")(distance)
 model = Model(inputs=[imgA, imgB], outputs=outputs)
@@ -77,7 +91,7 @@ model = Model(inputs=[imgA, imgB], outputs=outputs)
 logging.info("Compiling model...")
 model.compile(loss="binary_crossentropy", optimizer="adam",
               metrics=["accuracy"])
-
+model.summary()
 # callbacks
 early_stopping = EarlyStopping(
     monitor='val_loss',  # Monitors the validation loss
@@ -88,8 +102,8 @@ early_stopping = EarlyStopping(
 # train the model
 logging.info("Training model...")
 history = model.fit(
-    [pairTrain[:, 0], pairTrain[:, 1]], labelTrain[:],
-    validation_data=([pairTest[:, 0], pairTest[:, 1]], labelTest[:]),
+    [pair_train[:, 0], pair_train[:, 1]], label_train[:],
+    validation_data=([pair_val[:, 0], pair_val[:, 1]], label_val[:]),
     batch_size=configuration.BATCH_SIZE,
     epochs=configuration.EPOCHS,
     callbacks=[early_stopping])
