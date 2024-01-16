@@ -11,7 +11,7 @@ def load_and_preprocess_image(image_path):
     :param image_path: path to file
     :return: Image
     """
-    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    image = cv2.imread(image_path)  # , cv2.COLOR_BGR2RGB
     image = image / 255.0  # scale [0-1]
     image = np.expand_dims(image, axis=-1)
     return image
