@@ -18,14 +18,8 @@ def build_siamese_model(input_shape, embedding_dim=48):
         input_shape=input_shape,  # Ensure input has three channels (RGB)
         include_top=False,
     )
-    data_augmentation = Sequential([
-        RandomFlip('horizontal'),
-        RandomRotation(0.2),
-    ])
 
-    # first
-    x = data_augmentation(inputs)
-    x = preprocess_input(x)
+    x = preprocess_input(inputs)
     x = base_model(x)
     x = GlobalAveragePooling2D()(x)
     x = Dense(1280, activation='relu')(x)
