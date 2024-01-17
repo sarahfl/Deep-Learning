@@ -14,6 +14,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 # from tensorflow.data import Dataset
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.utils import plot_model
+from tensorflow.keras.optimizers import Adam
 import numpy as np
 import logging
 import os
@@ -146,7 +147,7 @@ model = Model(inputs=[imgA, imgB], outputs=outputs)
 
 # compile the model
 logging.info("Compiling model...")
-model.compile(loss="binary_crossentropy", optimizer="adam",
+model.compile(loss="binary_crossentropy", optimizer=Adam(lr=0.001),
               metrics=["accuracy"])
 model.summary()
 output_path = '/tmp/model_1.png'
@@ -162,8 +163,8 @@ early_stopping = EarlyStopping(
 # train the model
 logging.info("Training model...")
 history = model.fit(
-    [pair_train[:, 0], pair_train[:, 1]], label_train[:],
-    validation_data=([pair_val[:, 0], pair_val[:, 1]], label_val[:]),
+    [pair_train[:, 0], pair_train[:, 1]], label_train,
+    validation_data=([pair_val[:, 0], pair_val[:, 1]], label_val),
     # train_dataset,
     # validation_data=val_dataset,
     batch_size=configuration.BATCH_SIZE,
