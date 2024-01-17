@@ -3,7 +3,7 @@
 
 import os
 IMG_SHAPE = (200, 200, 3)
-BATCH_SIZE = 64
+BATCH_SIZE = 32
 EPOCHS = 100
 
 FOLDER = "MS4"

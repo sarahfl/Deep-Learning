@@ -6,14 +6,12 @@ import configuration
 import cv2
 
 
-def load_and_preprocess_image(image_path):
+def load_image(image_path):
     """
     :param image_path: path to file
     :return: Image
     """
-    image = cv2.imread(image_path)  # , cv2.COLOR_BGR2RGB
-    image = image / 255.0  # scale [0-1]
-    image = np.expand_dims(image, axis=-1)
+    image = cv2.imread(image_path, cv2.COLOR_BGR2RGB)  # , cv2.COLOR_BGR2RGB
     return image
 
 
@@ -27,43 +25,37 @@ def read_csv():
     # df = pd.concat([df_face, df_no_face], axis=0, ignore_index=True)
 
     # shuffle dataframe
-    train_df = df.sample(frac=1)
-    return train_df
+    # train_df = df.sample(frac=1)  # TODO: Inlude again
+    return df  # train_df
 
 
-def make_pairs(images, labels):
-    # initialize two empty lists to hold the (image, image) pairs and
-    # labels to indicate if a pair is positive or negative
+def make_pairs(images, identities, num_identities, stop=False):
     pair_images = []
     pair_labels = []
-    # calculate the total number of classes present in the dataset
-    # and then build a list of indexes for each class label that
-    # provides the indexes for all examples with a given label
-    num_classes = len(np.unique(labels))
-    idx = [np.where(labels == i)[0] for i in range(0, num_classes)]
+
+    print(f"Number of unique identities {num_identities}")
+
+    # f(identity) = list of all indexes of said identity
+    idx = [np.where(identities == i)[0] for i in range(0, num_identities)]
+
     # loop over all images
-    for idxA in range(len(images)):
-        # grab the current image and label belonging to the current
-        # iteration
-        current_image = images[idxA]
-        label = labels[idxA]
-        # randomly pick an image that belongs to the *same* class
-        # label
-        idx_b = np.random.choice(idx[label])
-        pos_image = images[idx_b]
-        # prepare a positive pair and update the images and labels
-        # lists, respectively
+    for index_a in range(len(images)):
+        # current
+        current_image = images[index_a]
+        identity = identities[index_a]
+        # random image same identity
+        index_b = np.random.choice(idx[identity])
+        pos_image = images[index_b]
         pair_images.append([current_image, pos_image])
         pair_labels.append([1])
-        # grab the indices for each of the class labels *not* equal to
-        # the current label and randomly pick an image corresponding
-        # to a label *not* equal to the current label
-        neg_idx = np.where(labels != label)[0]
+
+        # random image different identity
+        neg_idx = np.where(identities != identity)[0]
         neg_image = images[np.random.choice(neg_idx)]
-        # prepare a negative pair of images and update our lists
         pair_images.append([current_image, neg_image])
         pair_labels.append([0])
-    # return a 2-tuple of our image pairs and labels
+
+    # return [(image, image), ...], labels
     return np.array(pair_images), np.array(pair_labels)
 
 

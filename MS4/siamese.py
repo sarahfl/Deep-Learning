@@ -12,7 +12,6 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 def build_siamese_model(input_shape, embedding_dim=48):
     # specify the inputs for the feature extractor network
-    print(input_shape)
     inputs = Input(shape=input_shape)
     base_model = MobileNetV2(
         weights='imagenet',  # Load weights pre-trained on ImageNet.
@@ -24,33 +23,13 @@ def build_siamese_model(input_shape, embedding_dim=48):
         RandomRotation(0.2),
     ])
 
-    inputs = Input((200, 200, 3))
-    x = Conv2D(96, (11, 11), padding="same", activation="relu")(inputs)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x = Dropout(0.3)(x)
-
-    x = Conv2D(256, (5, 5), padding="same", activation="relu")(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x = Dropout(0.3)(x)
-
-    x = Conv2D(384, (3, 3), padding="same", activation="relu")(x)
-    x = MaxPooling2D(pool_size=(2, 2))(x)
-    x = Dropout(0.3)(x)
-
-    pooled_output = GlobalAveragePooling2D()(x)
-    pooled_output = Dense(1024)(pooled_output)
-    outputs = Dense(128)(pooled_output)
-
-    model = Model(inputs, outputs)
-    return model
-
     # first
-    # x = data_augmentation(inputs)
-    # x = preprocess_input(x)
-    # x = base_model(x)
-    # x = GlobalAveragePooling2D()(x)
-    # x = Dense(1280, activation='relu')(x)
-    # x = Dropout(0.5)(x)
+    x = data_augmentation(inputs)
+    x = preprocess_input(x)
+    x = base_model(x)
+    x = GlobalAveragePooling2D()(x)
+    x = Dense(1280, activation='relu')(x)
+    x = Dropout(0.5)(x)
 
     # second
     # x = base_model(x)
@@ -70,7 +49,7 @@ def build_siamese_model(input_shape, embedding_dim=48):
 
     # pooled_output = GlobalAveragePooling2D()(x)
     outputs = Dense(embedding_dim)(x)
-    model = Model(inputs, outputs)
+    model = Model(inputs, outputs, name="siam_core")
 
     return model
 
