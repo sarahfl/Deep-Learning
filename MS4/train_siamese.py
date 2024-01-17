@@ -31,102 +31,54 @@ logging.basicConfig(
     ]
 )
 
+import helper
+import tensorflow as tf
 
-def do_mnist():
-    logging.info("[INFO] loading MNIST dataset...")
-    (trainX, trainY), (testX, testY) = mnist.load_data()  # ~/.keras/datasets/mnist.npz
+# image paths
+df = pd.read_csv('MS4/preprocessing/promis.csv')
+image_paths = df['path'].to_numpy()
+image_names = df['name'].to_numpy()
 
-    # utils.display_image(trainX, trainY, 7)
+# make pairs
+helper.create_pairs(image_paths, image_names)
 
-    trainX = trainX / 255.0  # scale [0-1]
-    testX = testX / 255.0  # scale [0-1]
-    # add a channel dimension to the images
-    trainX = np.expand_dims(trainX, axis=-1)
-    testX = np.expand_dims(testX, axis=-1)
-    # prepare the positive and negative pairs
-    logging.info("Preparing positive and negative pairs...")
-    (pairTrain, labelTrain) = utils.make_pairs(trainX, trainY)
-    (pairTest, labelTest) = utils.make_pairs(testX, testY)
+pair_df = pd.read_csv('MS4/data/pairs.csv')
+pair_1 = pair_df['image1'].to_numpy()
+pair_2 = pair_df['image2'].to_numpy()
+labels = pair_df['PairLabels'].to_numpy()
 
+dataset = tf.data.Dataset.from_tensor_slices(((pair_1, pair_2), labels))
+print('hier')
 
-def do_promis():
-    logging.info("[INFO] loading promis dataset...")
-    df = utils.read_csv()
-    df_name_astype_category = df['name'].astype('category')
-    code_to_category = dict(enumerate(df_name_astype_category.cat.categories))
-    num_identities = len(df_name_astype_category.cat.categories)
-    df["identity"] = df_name_astype_category.cat.codes
-    df.sort_values(by='identity').to_csv('/tmp/promis_identity.csv', index=True)
-    df.to_csv('/tmp/promis_identity_us.csv')
-    df["image"] = df["path"].apply(utils.load_image)
+dataset = dataset.map(lambda pair, label: helper.load_images(pair[0], pair[1], label))
 
-    # pair is a list of image pairs
-    # label is whether they are showing the same person or not
-
-    pair, label = utils.make_pairs(images=df['image'], identities=df['identity'], num_identities=num_identities)
-
-    # EXPLAIN PAIRS
-    # pair_expl, label_expl = utils.make_pairs(images=df['path'], identities=df['identity'],
-    #                                          num_identities=num_identities)
-    #
-    # df_explain = pd.DataFrame(
-    #     {'path1': pair_expl[:, 0], 'path2': pair_expl[:, 1], 'label': label_expl.flatten()})
-    # df_explain.to_csv('/tmp/promis_pair_expl.csv', index=True)
+for element in dataset.take(5):
+    print(element)
 
 
-    # pair = pair[:10]
-    # label = label[:10]
-    #
-    # # Assuming each element of pair is a tuple (image1, image2)
-    # image1_list = [p[0] for p in pair]
-    # image2_list = [p[1] for p in pair]
-    #
-    # # Assuming image1_list and image2_list are now lists of 3D NumPy arrays
-    # dataset = Dataset.from_tensor_slices(([image1_list, image2_list], label))
-    # print(dataset)
-    #
-    # print('Aufbau des Datensets: ', dataset.element_spec)
+print('Aufbau des Datensets: ', dataset.element_spec)
 
-    dataset_size = len(df)
-    ##
-    # -- SPLIT DATASET INTO TRAIN, VAL AND TEST --
-    # train=0.8, validation=0.1, test=0.1
-    train_size = int(0.8 * dataset_size)
-    val_size = int(0.1 * dataset_size)
-    test_size = dataset_size - train_size - val_size
+##
+# -- SPLIT DATASET INTO TRAIN, VAL AND TEST ----------------------------------------------------------------------------
+# train=0.8, validation=0.1, test=0.1
+dataset_size = dataset_size = len(df)
+train_size = int(0.8 * dataset_size)
+val_size = int(0.1 * dataset_size)
+test_size = dataset_size - train_size - val_size
 
-    # train_dataset = dataset.take(train_size)
-    # val_dataset = dataset.skip(train_size).take(val_size)
-    # test_dataset = dataset.skip(train_size + val_size)
-    #
-    # train_dataset = train_dataset.batch(configuration.BATCH_SIZE)
-    # val_dataset = val_dataset.batch(configuration.BATCH_SIZE)
-    # test_dataset = test_dataset.batch(configuration.BATCH_SIZE)
-    #
-    # train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
-    # val_dataset = val_dataset.prefetch(buffer_size=AUTOTUNE)
-    # test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
+train_dataset = dataset.take(train_size)
+val_dataset = dataset.skip(train_size).take(val_size)
+test_dataset = dataset.skip(train_size + val_size)
 
-    dataset_size = len(label)
-    train_size = int(0.7 * dataset_size)
-    val_size = int(0.15 * dataset_size)
-    test_size = dataset_size - train_size - val_size
+train_dataset = train_dataset.batch(configuration.BATCH_SIZE)
+val_dataset = val_dataset.batch(configuration.BATCH_SIZE)
+test_dataset = test_dataset.batch(configuration.BATCH_SIZE)
 
-    pair_train = pair[:train_size]
-    pair_val = pair[train_size:train_size + val_size]
-    pair_test = pair[train_size + val_size:]
-
-    label_train = label[:train_size]
-    label_val = label[train_size:train_size + val_size]
-    label_test = label[train_size + val_size:]
-
-    return (pair_train, label_train), (pair_val, label_val), (pair_test, label_test)
-    # print("Created datasets")
-    # return train_dataset, val_dataset, test_dataset
-
-
-(pair_train, label_train), (pair_val, label_val), (pair_test, label_test) = do_promis()
-# train_dataset, val_dataset, test_dataset = do_promis()
+##
+AUTOTUNE = tf.data.AUTOTUNE
+train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
+validation_dataset = val_dataset.prefetch(buffer_size=AUTOTUNE)
+test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
 
 # configure siamese
 logging.info("Building siamese network...")
@@ -163,8 +115,8 @@ early_stopping = EarlyStopping(
 # train the model
 logging.info("Training model...")
 history = model.fit(
-    [pair_train[:, 0], pair_train[:, 1]], label_train,
-    validation_data=([pair_val[:, 0], pair_val[:, 1]], label_val),
+    train_dataset,
+    validation_data=validation_dataset,
     # train_dataset,
     # validation_data=val_dataset,
     batch_size=configuration.BATCH_SIZE,
