@@ -1,3 +1,7 @@
+"""
+https://pyimagesearch.com/2020/11/30/siamese-networks-with-keras-tensorflow-and-deep-learning/
+"""
+
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
