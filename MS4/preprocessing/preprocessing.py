@@ -7,10 +7,9 @@ from PIL.Image import Resampling
 import pandas as pd
 
 
-def resize_pil(image_url):
+def resize_pil(image_url, width=200, height=200):
     with Image.open(image_url) as im:
         # Provide the target width and height of the image
-        (width, height) = (200, 200)
         im_resized = im.resize((width, height), resample=Resampling.LANCZOS)
         return im_resized
 
@@ -77,7 +76,7 @@ def images_to_csv(source_promis, source_face, source_celeb_a, destination_csv):
 
 SOURCE_PROMIS = 'MS4/data/promis'
 SOURCES_FACES = 'MS4/data/faces'
-SOURCES_CELEB_A = 'MS4/data/CelebA/'
+SOURCES_CELEB_A = 'MS4/data/CelebA/'  # 178, 218
 DESTINATION_CSV = 'MS4/preprocessing'
 
 images_to_csv(SOURCE_PROMIS, SOURCES_FACES, SOURCES_CELEB_A, DESTINATION_CSV)

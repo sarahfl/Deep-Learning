@@ -31,7 +31,8 @@ logging.basicConfig(
 )
 
 # image paths
-df = pd.read_csv('MS4/preprocessing/promis.csv')
+print(configuration.PREPROCESSING_CSV)
+df = pd.read_csv(configuration.PREPROCESSING_CSV)
 image_paths = df['path'].to_numpy()
 image_names = df['name'].to_numpy()
 
