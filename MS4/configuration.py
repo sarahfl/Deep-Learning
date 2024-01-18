@@ -12,6 +12,7 @@ MODEL_IDENTIFIER = "model1"
 BASE_OUTPUT = os.path.join(FOLDER, OUTPUT, MODEL_IDENTIFIER)
 MODEL_PATH = os.path.join(BASE_OUTPUT, "siamese_model")
 PLOT_PATH = os.path.join(BASE_OUTPUT, "plot.png")
+TRAINING_HISTORY_PATH = os.path.join(BASE_OUTPUT, "training_history.csv")
 
 LOG_PATH = os.path.join(BASE_OUTPUT, 'ms4.log')
 

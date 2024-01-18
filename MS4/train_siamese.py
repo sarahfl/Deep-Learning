@@ -40,7 +40,11 @@ image_paths = df['path'].to_numpy()
 image_names = df['name'].to_numpy()
 
 # make pairs
-helper.create_pairs(image_paths, image_names)
+if not os.path.isfile('MS4/data/pairs.csv'):
+    logging.info("Creating pairs...")
+    helper.create_pairs(image_paths, image_names)
+else:
+    logging.info("Pairs found. Continuing...")
 
 pair_df = pd.read_csv('MS4/data/pairs.csv')
 pair_1 = pair_df['image1'].to_numpy()
@@ -122,6 +126,11 @@ history = model.fit(
     batch_size=configuration.BATCH_SIZE,
     epochs=configuration.EPOCHS,
     callbacks=[early_stopping])
+
+training_history = history.history
+history_df = pd.DataFrame(training_history)
+history_df.to_csv(configuration.TRAINING_HISTORY_PATH, index=False)
+
 
 model.save(configuration.MODEL_PATH)
 logging.info("Plotting training history...")
