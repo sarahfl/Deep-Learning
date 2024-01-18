@@ -10,15 +10,14 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Lambda
 from tensorflow.keras.callbacks import EarlyStopping
-# from tensorflow.data import AUTOTUNE
-# from tensorflow.data import Dataset
-from tensorflow.keras.datasets import mnist
+from tensorflow.data import AUTOTUNE
+from tensorflow.data import Dataset
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras.optimizers import Adam
-import numpy as np
 import logging
 import os
 import pandas as pd
+import helper
 
 os.makedirs(os.path.dirname(configuration.LOG_PATH), exist_ok=True)
 
@@ -30,9 +29,6 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
-
-import helper
-import tensorflow as tf
 
 # image paths
 df = pd.read_csv('MS4/preprocessing/promis.csv')
@@ -51,8 +47,7 @@ pair_1 = pair_df['image1'].to_numpy()
 pair_2 = pair_df['image2'].to_numpy()
 labels = pair_df['PairLabels'].to_numpy()
 
-dataset = tf.data.Dataset.from_tensor_slices(((pair_1, pair_2), labels))
-print('hier')
+dataset = Dataset.from_tensor_slices(((pair_1, pair_2), labels))
 
 dataset = dataset.map(lambda pair, label: helper.load_images(pair[0], pair[1], label))
 
@@ -79,7 +74,7 @@ val_dataset = val_dataset.batch(configuration.BATCH_SIZE)
 test_dataset = test_dataset.batch(configuration.BATCH_SIZE)
 
 ##
-AUTOTUNE = tf.data.AUTOTUNE
+AUTOTUNE = AUTOTUNE
 train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
 validation_dataset = val_dataset.prefetch(buffer_size=AUTOTUNE)
 test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)

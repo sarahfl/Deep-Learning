@@ -44,7 +44,7 @@ def take_sample_images(source, destination, count):
         i = i + 1
 
 
-def images_to_csv(source_promis, source_face, destination_csv):
+def images_to_csv(source_promis, source_face, source_celeb_a, destination_csv):
     # promis
     df_promis = pd.DataFrame(columns=['path', 'name'])
     for image in os.listdir(source_promis):
@@ -67,9 +67,17 @@ def images_to_csv(source_promis, source_face, destination_csv):
 
     df_faces.to_csv(destination_csv + '/faces.csv')
 
+    # celebA
+    df_celeb_a = pd.read_csv(os.path.join(SOURCES_CELEB_A, "Anno", "identity_CelebA.txt"), sep=" ", names=["path", "name"])
+    df_celeb_a["path"] = df_celeb_a["path"].apply(
+        lambda file_name: os.path.join(SOURCES_CELEB_A, "img_align_celeba", file_name))
+
+    df_celeb_a.to_csv(destination_csv + '/celeb_a.csv')
+
 
 SOURCE_PROMIS = 'MS4/data/promis'
 SOURCES_FACES = 'MS4/data/faces'
+SOURCES_CELEB_A = 'MS4/data/CelebA/'
 DESTINATION_CSV = 'MS4/preprocessing'
 
-images_to_csv(SOURCE_PROMIS, SOURCES_FACES, DESTINATION_CSV)
+images_to_csv(SOURCE_PROMIS, SOURCES_FACES, SOURCES_CELEB_A, DESTINATION_CSV)

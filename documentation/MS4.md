@@ -1,4 +1,8 @@
 # MS4
+
+Execute python with "Deep-Learning/" as your working directory.
+
+## Basis
 - https://pyimagesearch.com/2020/11/23/building-image-pairs-for-siamese-networks-with-python/
 - https://pyimagesearch.com/2020/11/30/siamese-networks-with-keras-tensorflow-and-deep-learning/
 
