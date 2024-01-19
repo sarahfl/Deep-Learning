@@ -2,15 +2,16 @@
 # Stores keys like image shape, batch size and such
 
 import os
-BATCH_SIZE = 32
-EPOCHS = 100
+BATCH_SIZE = 64
+EPOCHS = 15  # 100
+LEARNING_RATE = 0.001
 
 MODEL_NUMBER = 1
 
 # MODEL_NAME := preprocessing csv name without .csv
 MODEL_NAME, IMG_SHAPE = "celeb_a", (178, 218, 3)
 # MODEL_NAME, IMG_SHAPE = "promis", (200, 200, 3)
-MODEL_IDENTIFIER = f"{MODEL_NAME}_model_{MODEL_NUMBER}"
+MODEL_IDENTIFIER = f"{MODEL_NAME}_model_{MODEL_NUMBER}_EPOCHS_{EPOCHS}_LR_{LEARNING_RATE}"
 
 FOLDER = "MS4"
 OUTPUT = "output"

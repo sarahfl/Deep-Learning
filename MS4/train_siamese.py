@@ -99,7 +99,7 @@ model = Model(inputs=[imgA, imgB], outputs=outputs)
 
 # compile the model
 logging.info("Compiling model...")
-model.compile(loss="binary_crossentropy", optimizer=Adam(lr=0.001),
+model.compile(loss="binary_crossentropy", optimizer=Adam(lr=configuration.LEARNING_RATE),
               metrics=["accuracy"])
 model.summary()
 output_path = '/tmp/model_1.png'
