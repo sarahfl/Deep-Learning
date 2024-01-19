@@ -14,12 +14,13 @@ from tensorflow.data import AUTOTUNE
 from tensorflow.data import Dataset
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import backend
 import logging
 import os
 import pandas as pd
 import helper
 
-os.makedirs(os.path.dirname(configuration.LOG_PATH), exist_ok=True)
+os.makedirs(os.path.dirname(configuration.LOG_PATH), exist_ok=True)  # to prevent overwriting model data
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,13 +38,13 @@ image_paths = df['path'].to_numpy()
 image_names = df['name'].to_numpy()
 
 # make pairs
-if not os.path.isfile('MS4/data/pairs.csv'):
+if not os.path.isfile(configuration.PAIR_PATH):
     logging.info("Creating pairs...")
     helper.create_pairs(image_paths, image_names)
 else:
     logging.info("Pairs found. Continuing...")
 
-pair_df = pd.read_csv('MS4/data/pairs.csv')
+pair_df = pd.read_csv(configuration.PAIR_PATH)
 pair_1 = pair_df['image1'].to_numpy()
 pair_2 = pair_df['image2'].to_numpy()
 labels = pair_df['PairLabels'].to_numpy()
@@ -52,16 +53,12 @@ dataset = Dataset.from_tensor_slices(((pair_1, pair_2), labels))
 
 dataset = dataset.map(lambda pair, label: helper.load_images(pair[0], pair[1], label))
 
-for element in dataset.take(5):
-    print(element)
-
-
 print('Aufbau des Datensets: ', dataset.element_spec)
 
 ##
 # -- SPLIT DATASET INTO TRAIN, VAL AND TEST ----------------------------------------------------------------------------
 # train=0.8, validation=0.1, test=0.1
-dataset_size = dataset_size = len(df)
+dataset_size = len(df)
 train_size = int(0.8 * dataset_size)
 val_size = int(0.1 * dataset_size)
 test_size = dataset_size - train_size - val_size
@@ -97,6 +94,21 @@ distance = Lambda(utils.euclidean_distance, name='lambda_eucl_dist')([featsA, fe
 outputs = Dense(1, activation="sigmoid")(distance)
 model = Model(inputs=[imgA, imgB], outputs=outputs)
 
+
+# contrastive_loss
+
+import tensorflow as tf
+def contrastive_loss(y_true, y_pred, margin=1):
+    y_true = tf.cast(y_true, y_pred.dtype)
+    print(y_true)
+    print(y_pred)
+    squared_preds = backend.square(y_pred)
+    squared_margin = backend.square(backend.maximum(margin - y_pred, 0))
+    loss = backend.mean(y_true * squared_preds + (1 - y_true) * squared_margin)
+
+    return loss
+
+
 # compile the model
 logging.info("Compiling model...")
 model.compile(loss="binary_crossentropy", optimizer=Adam(lr=configuration.LEARNING_RATE),
@@ -108,7 +120,7 @@ plot_model(model, to_file=output_path, show_shapes=True, show_layer_names=True)
 # callbacks
 early_stopping = EarlyStopping(
     monitor='val_loss',  # Monitors the validation loss
-    patience=10,  # Number of epochs with no improvement after which training will stop
+    patience=5,  # Number of epochs with no improvement after which training will stop
     restore_best_weights=True  # Restores the best model weights based on the monitored quantity
 )
 
@@ -126,7 +138,6 @@ history = model.fit(
 training_history = history.history
 history_df = pd.DataFrame(training_history)
 history_df.to_csv(configuration.TRAINING_HISTORY_PATH, index=False)
-
 
 model.save(configuration.MODEL_PATH)
 logging.info("Plotting training history...")

@@ -3,10 +3,10 @@
 
 import os
 BATCH_SIZE = 64
-EPOCHS = 15  # 100
+EPOCHS = 5  # 100
 LEARNING_RATE = 0.001
 
-MODEL_NUMBER = 1
+MODEL_NUMBER = 2
 
 # MODEL_NAME := preprocessing csv name without .csv
 MODEL_NAME, IMG_SHAPE = "celeb_a", (178, 218, 3)
@@ -22,3 +22,4 @@ MODEL_PATH = os.path.join(BASE_OUTPUT, "siamese_model")
 PLOT_PATH = os.path.join(BASE_OUTPUT, "plot.png")
 TRAINING_HISTORY_PATH = os.path.join(BASE_OUTPUT, "training_history.csv")
 LOG_PATH = os.path.join(BASE_OUTPUT, 'ms4.log')
+PAIR_PATH = f'MS4/data/pairs_{MODEL_NAME}.csv'

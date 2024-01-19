@@ -6,7 +6,6 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import configuration
 import cv2
 
 
@@ -17,20 +16,6 @@ def load_image(image_path):
     """
     image = cv2.imread(image_path, cv2.COLOR_BGR2RGB)  # , cv2.COLOR_BGR2RGB
     return image
-
-
-def read_csv():
-    df = pd.read_csv('MS4/preprocessing/promis.csv', index_col=0)  # df_face
-    # df_no_face = pd.read_csv('MS4/preprocessing/noFace_regression.csv', index_col=0)
-    # delta = len(df_no_face) - 12500
-    # drop_indices = np.random.choice(df_no_face.index, delta, replace=False)
-    # df_subset_noFace = df_no_face.drop(drop_indices)
-
-    # df = pd.concat([df_face, df_no_face], axis=0, ignore_index=True)
-
-    # shuffle dataframe
-    # train_df = df.sample(frac=1)  # TODO: Inlude again
-    return df  # train_df
 
 
 def make_pairs(images, identities, num_identities, stop=False):
@@ -95,3 +80,6 @@ def display_image(x, y, image_index):
     plt.title(f"Label: {y[image_index]}")  # Show the corresponding label
     plt.axis('off')  # Hide axis ticks and labels
     plt.show()
+
+
+
