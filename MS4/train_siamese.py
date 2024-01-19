@@ -38,7 +38,7 @@ image_paths = df['path'].to_numpy()
 image_names = df['name'].to_numpy()
 
 # make pairs
-if not os.path.isfile(configuration.PAIR_PATH):
+if not os.path.isfile(configuration.PAIR_PATH) or True:
     logging.info("Creating pairs...")
     helper.create_pairs(image_paths, image_names)
 else:
