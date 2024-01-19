@@ -3,7 +3,7 @@ import tensorflow as tf
 import pandas as pd
 import MS4.utils
 import helper
-
+import logging
 
 pair_df = pd.read_csv(configuration.PAIR_PATH)
 pair_1 = pair_df['image1'].to_numpy()
@@ -27,8 +27,9 @@ val_dataset = val_dataset.batch(configuration.BATCH_SIZE)
 test_dataset = test_dataset.batch(configuration.BATCH_SIZE)
 
 custom_objects = {"MS4.utils": MS4.utils, "euclidean_distance": MS4.utils.euclidean_distance}
+logging.info(f"Loading model {configuration.MODEL_PATH}")
 model = tf.keras.models.load_model(configuration.MODEL_PATH, custom_objects=custom_objects)
 
-predictions = model.predict(dataset)
+predictions = model.predict(test_dataset)
 print(predictions)
 

@@ -7,7 +7,7 @@ import os
 import numpy as np
 
 
-def create_pairs(image_path, image_name, simple=False, size=10):
+def create_pairs(image_path, image_name, invers=False, simple=False, size=10):
     logging.info("Sanity check")
     for path in image_path:
         if not os.path.isfile(path):
@@ -57,10 +57,7 @@ def create_pairs(image_path, image_name, simple=False, size=10):
 
                 image_pairs_name.append([image_name[i], image_name[j]])
 
-                if image_name[i] == image_name[j]:
-                    pair_labels.append(1)
-                else:
-                    pair_labels.append(0)
+                pair_labels.append(image_name[i] == image_name[j] if invers else image_name[i] != image_name[j])
 
     # Create a DataFrame
     data = {'image1': image_pairs_1, 'image2': image_pairs_2, 'ImagePairsName': image_pairs_name,

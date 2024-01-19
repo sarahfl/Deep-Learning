@@ -9,8 +9,8 @@ LEARNING_RATE = 0.001
 MODEL_NUMBER = 2
 
 # MODEL_NAME := preprocessing csv name without .csv
-MODEL_NAME, IMG_SHAPE = "celeb_a", (178, 218, 3)
-# MODEL_NAME, IMG_SHAPE = "promis", (200, 200, 3)
+# MODEL_NAME, IMG_SHAPE = "celeb_a", (178, 218, 3)
+MODEL_NAME, IMG_SHAPE = "promis", (200, 200, 3)
 MODEL_IDENTIFIER = f"{MODEL_NAME}_model_{MODEL_NUMBER}_EPOCHS_{EPOCHS}_LR_{LEARNING_RATE}"
 
 FOLDER = "MS4"

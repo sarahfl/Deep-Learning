@@ -38,7 +38,7 @@ image_paths = df['path'].to_numpy()
 image_names = df['name'].to_numpy()
 
 # make pairs
-if not os.path.isfile(configuration.PAIR_PATH) or True:
+if not os.path.isfile(configuration.PAIR_PATH):
     logging.info("Creating pairs...")
     helper.create_pairs(image_paths, image_names)
 else:
@@ -142,3 +142,5 @@ history_df.to_csv(configuration.TRAINING_HISTORY_PATH, index=False)
 model.save(configuration.MODEL_PATH)
 logging.info("Plotting training history...")
 utils.plot_training(history.history, configuration.PLOT_PATH)
+
+model.predict(train_dataset)
