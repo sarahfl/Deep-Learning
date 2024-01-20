@@ -32,11 +32,11 @@ test_dataset = test_dataset.batch(configuration.BATCH_SIZE)
 
 custom_objects = {"MS4.utils": MS4.utils, "euclidean_distance": MS4.utils.euclidean_distance}
 logging.info(f"Loading model {configuration.MODEL_PATH}")
-# model = tf.keras.models.load_model(configuration.MODEL_PATH, custom_objects=custom_objects)
+model = tf.keras.models.load_model(configuration.MODEL_PATH, custom_objects=custom_objects)
 
-# predictions = model.predict(test_dataset)
+predictions = model.predict(test_dataset)
 # np.save("test.anp", predictions)
-predictions = np.load("test.anp.npy")
+# predictions = np.load("test.anp.npy")
 # Assuming your predictions are in the range [0, 1] and you want to round them to 0 or 1
 true_labels = []
 
@@ -57,7 +57,10 @@ predictions_round_int = predictions_round_int.astype(int)
 conf_matrix = confusion_matrix(true_labels, predictions_round_int)
 
 # Print classification report
-print(classification_report(true_labels, predictions_round_int))
+report = classification_report(true_labels, predictions_round_int)
+print(report)
+with open(configuration.CLASSIFICATION_REPORT_PATH, 'w') as file:
+    print(report, file=file)
 
 # Plot confusion matrix as a heatmap
 sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', cbar=False,
@@ -66,4 +69,5 @@ sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', cbar=False,
 plt.xlabel('Predicted')
 plt.ylabel('Actual')
 plt.title('Confusion Matrix')
+plt.savefig(configuration.HEAT_MAP_PATH)
 plt.show()

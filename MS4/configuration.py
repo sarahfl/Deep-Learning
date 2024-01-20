@@ -3,10 +3,11 @@
 
 import os
 BATCH_SIZE = 64
-EPOCHS = 5  # 100
-LEARNING_RATE = 0.001
+EPOCHS = 50  # 100
+LEARNING_RATE = 0.0001
+BUFFER_SIZE = 1000
 
-MODEL_NUMBER = 2
+MODEL_NUMBER = 6
 
 # MODEL_NAME := preprocessing csv name without .csv
 # MODEL_NAME, IMG_SHAPE = "celeb_a", (178, 218, 3)
@@ -23,3 +24,5 @@ PLOT_PATH = os.path.join(BASE_OUTPUT, "plot.png")
 TRAINING_HISTORY_PATH = os.path.join(BASE_OUTPUT, "training_history.csv")
 LOG_PATH = os.path.join(BASE_OUTPUT, 'ms4.log')
 PAIR_PATH = f'MS4/data/pairs_{MODEL_NAME}.csv'
+HEAT_MAP_PATH = os.path.join(BASE_OUTPUT, "confusion_matrix.png")
+CLASSIFICATION_REPORT_PATH = os.path.join(BASE_OUTPUT, "report.txt")

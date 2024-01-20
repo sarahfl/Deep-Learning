@@ -15,6 +15,7 @@ from tensorflow.data import Dataset
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import backend
+from tensorflow import cast
 import logging
 import os
 import pandas as pd
@@ -40,7 +41,7 @@ image_names = df['name'].to_numpy()
 # make pairs
 if not os.path.isfile(configuration.PAIR_PATH):
     logging.info("Creating pairs...")
-    helper.create_pairs(image_paths, image_names)
+    helper.create_pairs(image_paths, image_names, simple=True)
 else:
     logging.info("Pairs found. Continuing...")
 
@@ -52,7 +53,7 @@ labels = pair_df['PairLabels'].to_numpy()
 dataset = Dataset.from_tensor_slices(((pair_1, pair_2), labels))
 
 dataset = dataset.map(lambda pair, label: helper.load_images(pair[0], pair[1], label))
-
+dataset = dataset.shuffle(configuration.BUFFER_SIZE)
 print('Aufbau des Datensets: ', dataset.element_spec)
 
 ##
@@ -96,10 +97,8 @@ model = Model(inputs=[imgA, imgB], outputs=outputs)
 
 
 # contrastive_loss
-
-import tensorflow as tf
 def contrastive_loss(y_true, y_pred, margin=1):
-    y_true = tf.cast(y_true, y_pred.dtype)
+    y_true = cast(y_true, y_pred.dtype)
     print(y_true)
     print(y_pred)
     squared_preds = backend.square(y_pred)
@@ -143,4 +142,4 @@ model.save(configuration.MODEL_PATH)
 logging.info("Plotting training history...")
 utils.plot_training(history.history, configuration.PLOT_PATH)
 
-model.predict(train_dataset)
+print(model.predict(test_dataset))
