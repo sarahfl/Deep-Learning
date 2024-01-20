@@ -30,7 +30,18 @@ train_dataset = train_dataset.batch(configuration.BATCH_SIZE)
 val_dataset = val_dataset.batch(configuration.BATCH_SIZE)
 test_dataset = test_dataset.batch(configuration.BATCH_SIZE)
 
-custom_objects = {"MS4.utils": MS4.utils, "euclidean_distance": MS4.utils.euclidean_distance}
+
+def contrastive_loss(y_true, y_pred, margin=1):
+    y_true = cast(y_true, y_pred.dtype)
+    squared_preds = backend.square(y_pred)
+    squared_margin = backend.square(backend.maximum(margin - y_pred, 0))
+    loss = backend.mean(y_true * squared_preds + (1 - y_true) * squared_margin)
+
+    return loss
+
+
+custom_objects = {"MS4.utils": MS4.utils, "euclidean_distance": MS4.utils.euclidean_distance,
+                  "contrastive_loss": contrastive_loss}
 logging.info(f"Loading model {configuration.MODEL_PATH}")
 model = tf.keras.models.load_model(configuration.MODEL_PATH, custom_objects=custom_objects)
 

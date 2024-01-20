@@ -39,7 +39,7 @@ image_paths = df['path'].to_numpy()
 image_names = df['name'].to_numpy()
 
 # make pairs
-if not os.path.isfile(configuration.PAIR_PATH):
+if not os.path.isfile(configuration.PAIR_PATH) or True:
     logging.info("Creating pairs...")
     helper.create_pairs(image_paths, image_names, simple=True)
 else:
@@ -99,8 +99,6 @@ model = Model(inputs=[imgA, imgB], outputs=outputs)
 # contrastive_loss
 def contrastive_loss(y_true, y_pred, margin=1):
     y_true = cast(y_true, y_pred.dtype)
-    print(y_true)
-    print(y_pred)
     squared_preds = backend.square(y_pred)
     squared_margin = backend.square(backend.maximum(margin - y_pred, 0))
     loss = backend.mean(y_true * squared_preds + (1 - y_true) * squared_margin)
@@ -110,7 +108,7 @@ def contrastive_loss(y_true, y_pred, margin=1):
 
 # compile the model
 logging.info("Compiling model...")
-model.compile(loss="binary_crossentropy", optimizer=Adam(lr=configuration.LEARNING_RATE),
+model.compile(loss=contrastive_loss, optimizer=Adam(lr=configuration.LEARNING_RATE),
               metrics=["accuracy"])
 model.summary()
 output_path = '/tmp/model_1.png'
