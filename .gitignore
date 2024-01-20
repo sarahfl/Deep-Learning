@@ -172,3 +172,4 @@ MS3/Model/data
 *.keras
 deutschePromis
 starWars
+*.h5

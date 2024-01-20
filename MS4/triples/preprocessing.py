@@ -1,7 +1,5 @@
 import os.path
 from itertools import product
-
-import cv2
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -81,6 +79,7 @@ def make_triples_positive(source_promis):
 
         cross_product_list = create_cross_product(anchor, positive)
 
+
         for tuple in cross_product_list:
             name = [tuple[0].split('_')[0], tuple[1].split('_')[0]]
             df_triples_positive = df_triples_positive._append(
@@ -100,7 +99,7 @@ def make_triples_negative():
     for element in tqdm(anchor):
         name = element.split('/')
         name = name[4].split('_')[0]
-        negative = choose_random_image('MS4/data/MS3_rawData(2)/MS3_rawData/UTKFace')
+        negative = choose_random_image('/home/sarah/Deep-Learning/MS4/data/MS3_rawData(2)/MS3_rawData/UTKFace')
         df_triples_negative = df_triples_negative._append({
             'anchor': element, 'negative': negative, 'name': [name, 'face'], 'label': 0
         }, ignore_index=True)
