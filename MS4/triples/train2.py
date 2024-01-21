@@ -8,7 +8,7 @@ BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
 EPOCHS = 10
 IMG_SHAPE = IMG_SIZE + (3,)
-name = 'model10'
+name = 'model7'
 
 # -- GET DATA ----------------------------------------------------------------------------------------------------------
 df_positive = pd.read_csv('/home/sarah/Deep-Learning/MS4/data/triple_positive.csv', index_col=0)
@@ -94,7 +94,7 @@ negative_input = layers.Input(shape=IMG_SHAPE, name="Negative_Input")
 preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
 
 # COMPUTE DISTANCE
-distance_layer = helper.DistanceLayer()
+distance_layer = helper.DistanceLayer2()
 anchor_embedding = embedding(preprocess_input(tf.cast(anchor_input, tf.float32)))
 positive_embedding = embedding(preprocess_input(tf.cast(positive_input, tf.float32)))
 negative_embedding = embedding(preprocess_input(tf.cast(negative_input, tf.float32)))
@@ -111,55 +111,13 @@ siamese_network = tf.keras.Model(
 siamese_network.summary()
 tf.keras.utils.plot_model(siamese_network, show_shapes=True, show_layer_names=True)
 
-# build custom siamese keras model
-siamese_model = helper.SiameseModel(siamese_network)
-
-# compile model
-optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
-siamese_model.compile(optimizer=optimizer, weighted_metrics=[])
-
 # -- TRAIN MODEL -------------------------------------------------------------------------------------------------------
-loss, metrics = helper.train_model(siamese_model, train_dataset, EPOCHS, val_dataset, BATCH_SIZE)
+siamese_model = helper.SiameseModel(siamese_network)
+siamese_model.compile(optimizer=tf.keras.optimizers.Adam(0.001))
+history = siamese_model.fit(train_dataset, epochs=EPOCHS, validation_data=val_dataset)
 
-# save weights
+history_df = pd.DataFrame(history.history)
+history_df.to_csv('/home/sarah/Deep-Learning/MS4/triples/Model/{}/history.csv'.format(name), index=False)
+
 siamese_model.save_weights("/home/sarah/Deep-Learning/MS4/triples/Model/{}/final_weights.h5".format(name))
-
-# -- EVALUATE ON TEST DATA ---------------------------------------------------------------------------------------------
-evaluation_metrics = helper.evaluate_model(siamese_model, test_dataset)
-result_filename = '/home/sarah/Deep-Learning/MS4/triples/Model/{}/result_test_loss.txt'.format(name)
-with open(result_filename, 'w') as file:
-    print("Test Loss:", evaluation_metrics, file=file)
-
-# plot metrics
-helper.plot_metrics(loss, metrics, name)
-
-# save metrics to csv
-csv_filename = "/home/sarah/Deep-Learning/MS4/triples/Model/{}/metrics.csv".format(name)
-helper.save_metrics_to_csv(loss, metrics, csv_filename)
-
-# -- TEST AND ANALYZE --------------------------------------------------------------------------------------------------
-encode_model = helper.get_model(IMG_SHAPE)
-filepath = "/home/sarah/Deep-Learning/MS4/triples/Model/{}/final_weights.h5".format(name)
-encode_model.load_weights(filepath, by_name=True)
-
-# Analyze Test Dataset
-similarities = helper.calculate_similarity_tensor(embedding, test_dataset)
-tupels = helper.convert_to_tuples_tensor(similarities)
-differences = helper.calculate_differences_within_tuples(tupels)
-avg = helper.average(differences)
-print(avg)
-
-# Doppelganger Dataset
-similarities_doppelganger = helper.calculate_similarity(embedding, helper.image_pairs)
-tupels_doppelganger = helper.convert_to_tuples(similarities_doppelganger)
-differences_doppelganger = helper.calculate_differences_within_tuples(tupels_doppelganger)
-avg_doppelganger = helper.average(differences_doppelganger)
-print(avg_doppelganger)
-helper.plot_image_triples(helper.image_pairs, similarities_doppelganger, name)
-
-avg_filename = '/home/sarah/Deep-Learning/MS4/triples/Model/{}/avg.txt'.format(name)
-with open(avg_filename, 'w') as file:
-    print("Test Avg:", avg, file=file)
-    print("Doppelganger Avg:", avg_doppelganger, file=file)
-    print('Differences:', differences_doppelganger, file=file)
 
