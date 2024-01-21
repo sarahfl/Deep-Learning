@@ -1,8 +1,5 @@
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.layers import Dropout
-from tensorflow.keras.layers import GlobalAveragePooling2D
+from tensorflow.keras.layers import Input, Dense, Dropout, GlobalAveragePooling2D, BatchNormalization, Flatten
 from tensorflow.keras.layers import RandomFlip
 from tensorflow.keras.layers import RandomRotation, Conv2D, MaxPooling2D
 from tensorflow.keras.applications import MobileNetV2
@@ -19,13 +16,35 @@ def build_siamese_model(input_shape, embedding_dim=48):
         include_top=False,
     )
 
-    x = preprocess_input(inputs)
-    x = base_model(x)
-    x = GlobalAveragePooling2D()(x)
-    x = Dense(1280, activation='relu')(x)
+    for i in range(len(base_model.layers) - 50):
+        base_model.layers[i].trainable = False
+
+    x = Flatten()(inputs)
+    x = Dense(512, activation='relu')(x)
+    x = BatchNormalization()(x)
+    x = Dense(256, activation='relu')(x)
+    x = BatchNormalization()(x)
+    x = Dense(256, activation='relu')(x)
     x = Dropout(0.5)(x)
 
     # second
+    # x = preprocess_input(inputs)
+    # x = base_model(x)
+    # x = GlobalAveragePooling2D()(x)
+    # x = Dense(1280, activation='relu')(x)
+    # x = Dropout(0.5)(x)
+
+    # third
+    # model = Sequential([
+    #     base_model,
+    #     GlobalAveragePooling2D(),
+    #     Dense(512, activation='relu'),
+    #     BatchNormalization(),
+    #     Dropout(0.5),
+    #     Dense(256, activation="relu")
+    # ], name="Encode_Model")
+
+    # first
     # x = base_model(x)
     # x = GlobalAveragePooling2D()(x)
     # x = Dense(1280, activation='relu')(x)
@@ -40,8 +59,8 @@ def build_siamese_model(input_shape, embedding_dim=48):
     # x = Conv2D(64, (3, 3), padding="same", activation="relu")(x)  # Adjust filter size to 3x3
     # x = MaxPooling2D(pool_size=(2, 2))(x)
     # x = Dropout(0.3)(x)
-
     # pooled_output = GlobalAveragePooling2D()(x)
+
     outputs = Dense(embedding_dim)(x)
     model = Model(inputs, outputs, name="siam_core")
 

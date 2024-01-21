@@ -21,7 +21,7 @@ import os
 import pandas as pd
 import helper
 
-os.makedirs(os.path.dirname(configuration.LOG_PATH), exist_ok=True)  # to prevent overwriting model data
+os.makedirs(os.path.dirname(configuration.LOG_PATH), exist_ok=False)  # to prevent overwriting model data
 
 logging.basicConfig(
     level=logging.INFO,
@@ -35,6 +35,9 @@ logging.basicConfig(
 # image paths
 print(configuration.PREPROCESSING_CSV)
 df = pd.read_csv(configuration.PREPROCESSING_CSV)
+
+df = df.head(len(df) // 4)
+
 image_paths = df['path'].to_numpy()
 image_names = df['name'].to_numpy()
 
@@ -44,7 +47,6 @@ if not os.path.isfile(configuration.PAIR_PATH) or True:
     helper.create_pairs(image_paths, image_names, simple=True)
 else:
     logging.info("Pairs found. Continuing...")
-
 pair_df = pd.read_csv(configuration.PAIR_PATH)
 pair_1 = pair_df['image1'].to_numpy()
 pair_2 = pair_df['image2'].to_numpy()
@@ -60,6 +62,7 @@ print('Aufbau des Datensets: ', dataset.element_spec)
 # -- SPLIT DATASET INTO TRAIN, VAL AND TEST ----------------------------------------------------------------------------
 # train=0.8, validation=0.1, test=0.1
 dataset_size = len(df)
+logging.info(f"Dataset Size: {dataset_size}")
 train_size = int(0.8 * dataset_size)
 val_size = int(0.1 * dataset_size)
 test_size = dataset_size - train_size - val_size
@@ -139,5 +142,3 @@ history_df.to_csv(configuration.TRAINING_HISTORY_PATH, index=False)
 model.save(configuration.MODEL_PATH)
 logging.info("Plotting training history...")
 utils.plot_training(history.history, configuration.PLOT_PATH)
-
-print(model.predict(test_dataset))

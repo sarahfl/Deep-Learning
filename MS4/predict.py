@@ -32,11 +32,10 @@ test_dataset = test_dataset.batch(configuration.BATCH_SIZE)
 
 
 def contrastive_loss(y_true, y_pred, margin=1):
-    y_true = cast(y_true, y_pred.dtype)
-    squared_preds = backend.square(y_pred)
-    squared_margin = backend.square(backend.maximum(margin - y_pred, 0))
-    loss = backend.mean(y_true * squared_preds + (1 - y_true) * squared_margin)
-
+    y_true = tf.cast(y_true, y_pred.dtype)
+    squared_preds = tf.keras.backend.square(y_pred)
+    squared_margin = tf.keras.backend.square(tf.keras.backend.maximum(margin - y_pred, 0))
+    loss = tf.keras.backend.mean(y_true * squared_preds + (1 - y_true) * squared_margin)
     return loss
 
 
@@ -45,7 +44,7 @@ custom_objects = {"MS4.utils": MS4.utils, "euclidean_distance": MS4.utils.euclid
 logging.info(f"Loading model {configuration.MODEL_PATH}")
 model = tf.keras.models.load_model(configuration.MODEL_PATH, custom_objects=custom_objects)
 
-predictions = model.predict(test_dataset)
+predictions = model.predict(train_dataset)
 # np.save("test.anp", predictions)
 # predictions = np.load("test.anp.npy")
 # Assuming your predictions are in the range [0, 1] and you want to round them to 0 or 1
@@ -59,9 +58,6 @@ print(len(predictions))
 print("---")
 print(len(true_labels))
 # print(sum(predictions - true_labels))
-print(true_labels.shape)
-print(predictions.flatten().shape)
-print(predictions.flatten())
 predictions_round_int = np.round(predictions.flatten())
 predictions_round_int = predictions_round_int.astype(int)
 # Create confusion matrix
@@ -70,8 +66,8 @@ conf_matrix = confusion_matrix(true_labels, predictions_round_int)
 # Print classification report
 report = classification_report(true_labels, predictions_round_int)
 print(report)
-with open(configuration.CLASSIFICATION_REPORT_PATH, 'w') as file:
-    print(report, file=file)
+#with open(configuration.CLASSIFICATION_REPORT_PATH, 'w') as file:
+#    print(report, file=file)
 
 # Plot confusion matrix as a heatmap
 sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', cbar=False,
@@ -80,5 +76,5 @@ sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', cbar=False,
 plt.xlabel('Predicted')
 plt.ylabel('Actual')
 plt.title('Confusion Matrix')
-plt.savefig(configuration.HEAT_MAP_PATH)
+# plt.savefig(configuration.HEAT_MAP_PATH)
 plt.show()
