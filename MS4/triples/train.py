@@ -8,7 +8,7 @@ BATCH_SIZE = 32
 IMG_SIZE = (200, 200)
 EPOCHS = 10
 IMG_SHAPE = IMG_SIZE + (3,)
-name = 'model10'
+name = 'model4'
 
 # -- GET DATA ----------------------------------------------------------------------------------------------------------
 df_positive = pd.read_csv('/home/sarah/Deep-Learning/MS4/data/triple_positive.csv', index_col=0)
@@ -143,19 +143,19 @@ filepath = "/home/sarah/Deep-Learning/MS4/triples/Model/{}/final_weights.h5".for
 encode_model.load_weights(filepath, by_name=True)
 
 # Analyze Test Dataset
-similarities = helper.calculate_similarity_tensor(embedding, test_dataset)
+similarities = helper.calculate_similarity_tensor(encode_model, test_dataset)
 tupels = helper.convert_to_tuples_tensor(similarities)
 differences = helper.calculate_differences_within_tuples(tupels)
 avg = helper.average(differences)
 print(avg)
 
 # Doppelganger Dataset
-similarities_doppelganger = helper.calculate_similarity(embedding, helper.image_pairs)
+similarities_doppelganger = helper.calculate_similarity(encode_model, helper.image_doppelganger)
 tupels_doppelganger = helper.convert_to_tuples(similarities_doppelganger)
 differences_doppelganger = helper.calculate_differences_within_tuples(tupels_doppelganger)
 avg_doppelganger = helper.average(differences_doppelganger)
 print(avg_doppelganger)
-helper.plot_image_triples(helper.image_pairs, similarities_doppelganger, name)
+helper.plot_image_triples(helper.image_doppelganger, similarities_doppelganger, name)
 
 avg_filename = '/home/sarah/Deep-Learning/MS4/triples/Model/{}/avg.txt'.format(name)
 with open(avg_filename, 'w') as file:
