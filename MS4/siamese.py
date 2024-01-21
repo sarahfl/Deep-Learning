@@ -19,6 +19,7 @@ def build_siamese_model(input_shape, embedding_dim=48):
     for i in range(len(base_model.layers) - 50):
         base_model.layers[i].trainable = False
 
+    # Fourth
     x = Flatten()(inputs)
     x = Dense(512, activation='relu')(x)
     x = BatchNormalization()(x)

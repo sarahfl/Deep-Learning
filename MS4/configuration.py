@@ -3,11 +3,11 @@
 
 import os
 BATCH_SIZE = 64
-EPOCHS = 50  # 100
+EPOCHS = 200  # 100
 LEARNING_RATE = 0.001
 BUFFER_SIZE = 1000
 
-MODEL_NUMBER = 3
+MODEL_NUMBER = 7
 
 # MODEL_NAME := preprocessing csv name without .csv
 MODEL_NAME, IMG_SHAPE = "celeb_a", (178, 218, 3)
