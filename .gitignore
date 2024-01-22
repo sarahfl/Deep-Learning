@@ -170,5 +170,8 @@ MS3_rawData
 MS4/data
 MS3/Model/data
 *.keras
+*.pb
+*.data*
+*.index
 deutschePromis
 starWars

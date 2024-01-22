@@ -21,7 +21,7 @@ import os
 import pandas as pd
 import helper
 
-os.makedirs(os.path.dirname(configuration.LOG_PATH), exist_ok=False)  # to prevent overwriting model data
+os.makedirs(os.path.dirname(configuration.LOG_PATH), exist_ok=True)  # to prevent overwriting model data
 
 logging.basicConfig(
     level=logging.INFO,
