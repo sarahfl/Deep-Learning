@@ -173,5 +173,6 @@ MS3/Model/data
 *.pb
 *.data*
 *.index
+**/siamese_model
 deutschePromis
 starWars
