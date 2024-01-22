@@ -69,7 +69,7 @@ def plot_training(history, plot_path):
     plt.title("Training Loss and Accuracy")
     plt.xlabel("Epoch")
     plt.ylabel("Loss/Accuracy")
-    plt.legend(loc="lower left")
+    plt.legend()
     plt.savefig(plot_path)
 
 
