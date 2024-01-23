@@ -44,7 +44,7 @@ def create_pairs(image_path, image_name, correct=0, incorrect=1, simple=True, si
 
             image_pairs_1 = np.concatenate((image_pairs_1, np.full(actual_size, current_image_path)))
             image_pairs_2 = np.concatenate((image_pairs_2, pos_path))
-            pair_labels = np.concatenate((pair_labels, np.ones(len(pos_path))*correct))
+            pair_labels = np.concatenate((pair_labels, np.ones(len(pos_path)) * correct))
             pos_names_stack = [f"{a}|{b}" for a, b in zip(np.full(len(pos_path), current_image_name), pos_names)]
             image_pairs_name = np.concatenate((image_pairs_name, pos_names_stack))
             # random image different identity
@@ -55,7 +55,7 @@ def create_pairs(image_path, image_name, correct=0, incorrect=1, simple=True, si
 
             image_pairs_1 = np.concatenate((image_pairs_1, np.full(actual_size, current_image_path)))
             image_pairs_2 = np.concatenate((image_pairs_2, neg_path))
-            pair_labels = np.concatenate((pair_labels, np.ones(len(neg_path))*incorrect))
+            pair_labels = np.concatenate((pair_labels, np.ones(len(neg_path)) * incorrect))
             neg_names_stack = [f"{a}|{b}" for a, b in zip(np.full(len(pos_path), current_image_name), neg_names)]
             image_pairs_name = np.concatenate((image_pairs_name, neg_names_stack))
     else:
@@ -89,3 +89,9 @@ def load_images(pair_1, pair_2, label):
     image_1 = load_image(pair_1)
     image_2 = load_image(pair_2)
     return (image_1, image_2), label
+
+
+def load_images_2(pair_1, pair_2):
+    image_1 = load_image(pair_1)
+    image_2 = load_image(pair_2)
+    return (image_1, image_2)
